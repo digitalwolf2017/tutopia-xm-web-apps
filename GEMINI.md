@@ -1,0 +1,128 @@
+# Tutopia Exam (tutopiaxm) — Project Memory & Agent Guidelines
+
+> **Project Name:** Tutopia Exam Web App (`tutopiaxm`)  
+> **Tech Stack:** Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, shadcn/ui  
+> **Primary Purpose:** Modern, responsive web platform translating the Tutopia Exam Android App (v1.0) into a responsive, high-performance web application.  
+> **Brand Theme:** Signature Tutopia Primary Blue (`#0284C7`) and Vibrant Amber/Yellow (`#F59E0B`) with clean white cards and bottom accent stripes.
+
+---
+
+## 1. Reference App Screen Mapping
+Original screenshots are stored in [`refrence/`](file:///Users/abhilash/work/nextjs/tutopiaxm/refrence):
+
+| Screenshot | Original Screen | Web App Equivalent Route | Key Features & UX Notes |
+| :--- | :--- | :--- | :--- |
+| **Auth** | *(New Addition)* | `/(auth)/login`, `/(auth)/register` | Dual-mode login (Mobile OTP / Password), registration with target exam track, city & pincode. |
+| **`1.png`** | Home Dashboard | `/(dashboard)/page.tsx` | Header (avatar, name, bell, search), promotional banner carousel (₹1999 1-year prep), quick action pills, 2x2 video class cards. |
+| **`2.png`** | Mock Test List | `/(dashboard)/mock-tests` | Exam cards (100 Marks, 03:00 Hrs, last attempt date), "View History" link, sticky "View Mock test history" button. |
+| **`3.png`** | Video Class Categories | `/(dashboard)/subjects` | Dual-accent cards (SSC, RAIL, WBCS; Exams Portal; All Bank Exams; GK Class 9-12; One Line GK). |
+| **`4.png`** | Subject / Chapter Grid | `/(dashboard)/subjects/[category]` | Exam badge selector (`SSC`), live subject search bar, categorized topics (Maths, Reasoning, English, GK, Static GK) with chapter badges. |
+| **`5.png`** | Live Classes | `/(dashboard)/live-classes` | Live stream carousel, batch card with dates & yearly subscription badge, dual CTAs ("Explore" yellow, "Buy now" blue). |
+| **`6.png`** | More Menu | `/(dashboard)/more` | Settings list (My profile, Report an issue, Terms & conditions, Logout button, v1.0 footer). |
+| **`7.png`** | My Profile | `/(dashboard)/profile` | Profile details (Mobile, WhatsApp, City, Pincode), full-width yellow "Subscriptions" CTA, "Edit Profile" (blue) & "Change Password" buttons. |
+
+---
+
+## 2. Directory Architecture & Colocation Map
+The codebase follows a **Gemini-Optimized Feature Architecture** located under `src/`:
+
+```
+src/
+├── app/
+│   ├── (auth)/                       # Login, Register, Verify-OTP, Forgot-Password
+│   ├── (dashboard)/                  # Home, Mock Tests, Subjects, Live Classes, Profile, More
+│   └── api/                          # Next.js API Route Handlers
+├── components/
+│   ├── ui/                           # shadcn/ui components (Button, Card, Dialog, Input, etc.)
+│   ├── layout/                       # Header, Sidebar, MobileBottomBar, SearchDialog
+│   └── common/                       # BannerCarousel, CategoryCard, ExamPillButton
+├── features/                         # High-cohesion domain modules
+│   ├── auth/                         # Forms, validation schemas, auth session hooks
+│   ├── home/                         # Carousel, quick pills, video class categories
+│   ├── mock-tests/                   # Test cards, CBT full-screen runner, timer, question palette
+│   ├── subjects/                     # Subject filter, chapter accordion, topic grid
+│   ├── live-classes/                 # Live batch cards, video stream embed, interactive chat
+│   └── profile/                      # Profile card, edit dialog, subscriptions
+├── lib/
+│   ├── utils.ts                      # cn() class utility
+│   ├── constants.ts                  # App metadata, exam categories, navigation items
+│   └── mock-data.ts                  # High-fidelity mock dataset matching the reference screens
+└── types/                            # Global TypeScript interfaces
+```
+
+---
+
+## 3. Strict Rules & Conventions
+All agents and developers must adhere to the rules located in [`rules/`](file:///Users/abhilash/work/nextjs/tutopiaxm/rules):
+- **[`rules/01-design-system-and-theme.md`](file:///Users/abhilash/work/nextjs/tutopiaxm/rules/01-design-system-and-theme.md)**: Brand colors, 4px card bottom accent stripes, font hierarchies (Bengali + English).
+- **[`rules/02-nextjs-app-router-architecture.md`](file:///Users/abhilash/work/nextjs/tutopiaxm/rules/02-nextjs-app-router-architecture.md)**: Feature colocation, Server vs. Client component boundaries, `@/` absolute imports.
+- **[`rules/03-ui-ux-guidelines.md`](file:///Users/abhilash/work/nextjs/tutopiaxm/rules/03-ui-ux-guidelines.md)**: Dual responsive layout (Desktop sidebar + Mobile 3-tab bottom bar), full-screen CBT runner UX, phone + OTP forms.
+- **[`rules/04-code-quality-and-state-management.md`](file:///Users/abhilash/work/nextjs/tutopiaxm/rules/04-code-quality-and-state-management.md)**: Strict TypeScript, Zod schemas, URL-driven filtering, accessibility.
+
+---
+
+## 4. Development Status & Milestone Tracker
+
+### Phase 1: Foundation & Architecture Setup
+- [x] Analyze all 7 reference app screens from `refrence/`.
+- [x] Define Tutopia design tokens & color palette.
+- [x] Create comprehensive Architecture & UX Blueprint artifact (`app_architecture_and_ux_plan.md`).
+- [x] Create project directory skeleton (`src/`, `rules/`, `public/`).
+- [x] Create detailed rule files (`rules/01` to `rules/04`) and mirror to `.agents/rules/`.
+- [x] Establish `GEMINI.md` memory & tracking file.
+
+### Phase 2: Project Scaffolding & Design Tokens
+- [x] Initialize Next.js 15 with Tailwind CSS and TypeScript.
+- [x] Install Lucide React and core shadcn/ui primitives.
+- [x] Configure `globals.css` with Tutopia HSL color tokens.
+- [x] Create `@/lib/mock-data.ts` containing mock items for all 7 screens.
+
+### Phase 3: Auth Flow Implementation
+- [x] Build `(auth)/layout.tsx` (Split-screen on desktop, centered card on mobile).
+- [x] Build `/login` (Switchable OTP & Password tabs, +91 phone formatting).
+- [x] Build `/register` (Name, Phone, WhatsApp, Exam Selector, Pincode).
+
+### Phase 4: App Shell & Responsive Navigation
+- [x] Build `AppHeader` (Avatar, "Abhilash Bera", Exam track switcher, Search bar, Bell).
+- [x] Build `AppSidebar` (Desktop navigation).
+- [x] Build `MobileBottomBar` (Exact 3 tabs: Home, Live Classes, More).
+
+### Phase 5: Home & Subject Explorer
+- [x] Implement promotional carousel with Bengali text & pill dots.
+- [x] Build quick action pills ("Chapter wise MCQ", "Competitive Exam").
+- [x] Build Video Classes grid with blue and yellow bottom accent stripes.
+- [x] Build Subject & Chapter Explorer with real-time topic search and chapter counts.
+
+### Phase 6: Mock Test Portal & CBT Runner
+- [x] Build Mock Test listing cards with 100 Marks, 03:00 Hrs duration, and last attempt date.
+- [x] Build Computer-Based Test (CBT) full-screen exam runner with timer and question palette.
+- [x] Build Mock Test History and scorecard view.
+
+### Phase 7: Live Classes & Profile Hub
+- [x] Build Live Classes list with schedule dates, pricing tags, and dual CTAs ("Explore", "Buy now").
+- [x] Build My Profile view with contact details, Subscriptions CTA, Edit Profile, and Change Password.
+- [x] Build More menu screen with Report an Issue and Terms & Conditions views.
+
+### Phase 8: Chapter Explorer & Video Lectures (Screens 9 & 10)
+- [x] Add `ChapterItem` and `VideoLesson` schemas and mock datasets to `@/lib/mock-data.ts`.
+- [x] Implement Screen `9.png`: Chapter Explorer (`/subjects/[examCategory]/[subjectSlug]`) with topic pill switcher (`Arithmetic`, `Algebra`, `Geometry`, `Trigo`, `D.I`) and chapter listing.
+- [x] Implement Screen `10.png`: Video Lectures Playlist (`/subjects/[examCategory]/[subjectSlug]/[chapterSlug]`) with top-right chapter switcher dropdown (`NUMBER SYSTEM ⌵`), teal geometric thumbnails, and lock badges.
+- [x] Build interactive [`VideoPlayerDialog`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/[chapterSlug]/_components/video-player-dialog.tsx) and [`LockSubscriptionDialog`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/[chapterSlug]/_components/lock-subscription-dialog.tsx).
+- [x] Verify production build passes cleanly (`npm run build` exits with code 0).
+
+---
+
+## 5. Decision Log
+- **2026-10-17:** Retained exact mobile app 3-tab bottom bar on mobile viewports while upgrading to a full sidebar + command-palette layout on desktop.
+- **2026-10-17:** Added dedicated Authentication (`/login`, `/register`, `/verify-otp`) to capture student onboarding data consistent with the profile fields in `refrence/7.png`.
+- **2026-10-17:** Successfully scaffolded Next.js 15 App Router with full suite of screens matching the reference app, verified zero build errors.
+- **2026-10-17:** UI Enhancement & Polish: Removed dated bottom colored borders in favor of clean neutral borders (`border-slate-200/80`), standardized on compact `rounded-md` (0.375rem) corners, built a glassmorphic global header with ⌘K search and exam switcher, built custom branded animated SVG loader (`<TutopiaLoader />`), and introduced smooth micro-interactions.
+- **2026-10-17:** Header Streamlining: Removed exam track dropdown from [`AppHeader`](file:///Users/abhilash/work/nextjs/tutopiaxm/src/components/layout/app-header.tsx) to yield a clean global navigation bar focused on branding, search, notification alerts, and student profile. Verified 100% build pass across all 18 routes.
+- **2026-10-17:** Header Layout Refinement: Repositioned the global search bar (`w-64 lg:w-80`) to the left section directly adjacent to the Tutopia Exam brand logo, keeping the center open and the user tools docked to the right.
+- **2026-10-17:** Native Mobile Nav & Footer Experience: Re-engineered [`MobileBottomBar`](file:///Users/abhilash/work/nextjs/tutopiaxm/src/components/layout/mobile-bottom-bar.tsx) with GPU-accelerated smooth sliding capsule (`translateX`), top sliding accent glow bar, active icon elevation, live pulse badge, safe-area-bottom padding, and added a subtle desktop footer in [`DashboardLayout`](file:///Users/abhilash/work/nextjs/tutopiaxm/src/app/(dashboard)/layout.tsx).
+- **2026-10-17:** Floating Dock Style Navigation: Transformed the mobile bottom bar into a floating glassmorphic dock (`inset-x-3 bottom-3 sm:bottom-4`, `rounded-xl`, `shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)]`) with internal sliding pill indicator and expanded layout clearance (`pb-24`) to eliminate overlap on all mobile viewports.
+- **2026-10-22:** Live Classes Batch Visual Balance: Updated the right-side batch card ("Bank PO & Clerk 2026 Target Batch") thumbnail header from bright blue to a clean, simple dark gray placeholder background (`bg-slate-800`), providing visual hierarchy and contrast against the primary blue Tutopia batch card.
+- **2026-10-22:** Wireframe Placeholder & Normal Sidebar: Applied explicit `#CCCCCC` background color to the right-side batch card thumbnail with legible dark text/badges for an unmistakable placeholder appearance. Converted [`AppSidebar`](file:///Users/abhilash/work/nextjs/tutopiaxm/src/components/layout/app-sidebar.tsx) to sticky viewport navigation (`sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto`) so the sidebar remains fixed in place like a standard dashboard instead of scrolling with page height.
+- **2026-10-22:** Compact Live Hero Section: Replaced bloated fixed wide aspect ratio (`sm:aspect-[21/7]`) on the Live Classes featured classroom banner with a compact padding-based container (`p-4 sm:p-5`), reducing excessive vertical height from ~500px to ~100px so all batch cards and controls sit cleanly above the fold.
+- **2026-10-22:** 3-Card Grid & Uniform Wireframe Placeholders: Expanded the Live Batches collection to 3 courses (`SSC RAIL WBCS PSC`, `Bank PO & Clerk 2026`, and `Railway NTPC & Group D`) in a responsive 3-column grid (`lg:grid-cols-3`), standardizing all batch thumbnail banners to use the `#CCCCCC` placeholder styling with high-contrast text and clean badges.
+- **2026-10-22:** Chapter Explorer & Video Playlist Implementation (Screens 9 & 10): Delivered dedicated dynamic routes for `/subjects/[examCategory]/[subjectSlug]` (Screen 9.png) and `/subjects/[examCategory]/[subjectSlug]/[chapterSlug]` (Screen 10.png). Added topic pill switcher, chapter dropdown switcher, teal geometric video player cards, interactive video playback modal dialog, and subscription lock prompt dialog. Verified 100% build pass across all 18 routes.
