@@ -54,7 +54,7 @@ export default function AuthLayout({
         {/* Footer Support Info */}
         <div className="relative z-10 pt-8 border-t border-sky-600/50 flex items-center justify-between text-xs text-sky-200">
           <span>হেল্পলাইন: 9804490328</span>
-          <span>© 2026 Tutopia Exam Web. All rights reserved.</span>
+          <span>© 2026 Tutopia Exam Web. All rights reserved..</span>
         </div>
       </div>
 
