@@ -103,6 +103,13 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - [x] Build My Profile view with contact details, Subscriptions CTA, Edit Profile, and Change Password.
 - [x] Build More menu screen with Report an Issue and Terms & Conditions views.
 
+### Phase 8: Chapter Explorer & Video Lectures (Screens 9 & 10)
+- [x] Add `ChapterItem` and `VideoLesson` schemas and mock datasets to `@/lib/mock-data.ts`.
+- [x] Implement Screen `9.png`: Chapter Explorer (`/subjects/[examCategory]/[subjectSlug]`) with topic pill switcher (`Arithmetic`, `Algebra`, `Geometry`, `Trigo`, `D.I`) and chapter listing.
+- [x] Implement Screen `10.png`: Video Lectures Playlist (`/subjects/[examCategory]/[subjectSlug]/[chapterSlug]`) with top-right chapter switcher dropdown (`NUMBER SYSTEM ⌵`), teal geometric thumbnails, and lock badges.
+- [x] Build interactive [`VideoPlayerDialog`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/[chapterSlug]/_components/video-player-dialog.tsx) and [`LockSubscriptionDialog`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/[chapterSlug]/_components/lock-subscription-dialog.tsx).
+- [x] Verify production build passes cleanly (`npm run build` exits with code 0).
+
 ---
 
 ## 5. Decision Log
@@ -118,3 +125,4 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - **2026-10-22:** Wireframe Placeholder & Normal Sidebar: Applied explicit `#CCCCCC` background color to the right-side batch card thumbnail with legible dark text/badges for an unmistakable placeholder appearance. Converted [`AppSidebar`](file:///Users/abhilash/work/nextjs/tutopiaxm/src/components/layout/app-sidebar.tsx) to sticky viewport navigation (`sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto`) so the sidebar remains fixed in place like a standard dashboard instead of scrolling with page height.
 - **2026-10-22:** Compact Live Hero Section: Replaced bloated fixed wide aspect ratio (`sm:aspect-[21/7]`) on the Live Classes featured classroom banner with a compact padding-based container (`p-4 sm:p-5`), reducing excessive vertical height from ~500px to ~100px so all batch cards and controls sit cleanly above the fold.
 - **2026-10-22:** 3-Card Grid & Uniform Wireframe Placeholders: Expanded the Live Batches collection to 3 courses (`SSC RAIL WBCS PSC`, `Bank PO & Clerk 2026`, and `Railway NTPC & Group D`) in a responsive 3-column grid (`lg:grid-cols-3`), standardizing all batch thumbnail banners to use the `#CCCCCC` placeholder styling with high-contrast text and clean badges.
+- **2026-10-22:** Chapter Explorer & Video Playlist Implementation (Screens 9 & 10): Delivered dedicated dynamic routes for `/subjects/[examCategory]/[subjectSlug]` (Screen 9.png) and `/subjects/[examCategory]/[subjectSlug]/[chapterSlug]` (Screen 10.png). Added topic pill switcher, chapter dropdown switcher, teal geometric video player cards, interactive video playback modal dialog, and subscription lock prompt dialog. Verified 100% build pass across all 18 routes.

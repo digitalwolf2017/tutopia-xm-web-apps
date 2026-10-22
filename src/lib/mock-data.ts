@@ -70,6 +70,28 @@ export interface LiveBatch {
   bannerTheme?: "blue" | "placeholder" | "dark";
 }
 
+export interface ChapterItem {
+  id: string;
+  name: string;
+  slug: string;
+  videoCount: number;
+  completedVideos?: number;
+  description?: string;
+}
+
+export interface VideoLesson {
+  id: string;
+  chapterSlug: string;
+  title: string;
+  durationFormatted: string;
+  durationMinutes: number;
+  videoUrl?: string;
+  thumbnailPattern?: "teal-geometric" | "blue-waves" | "dark-slate";
+  isLocked: boolean;
+  order: number;
+  facultyName?: string;
+}
+
 // ---------------- MOCK DATA COLLECTIONS ----------------
 
 export const mockCurrentUser: StudentProfile = {
@@ -306,3 +328,140 @@ export const mockLiveBatches: LiveBatch[] = [
     bannerTheme: "placeholder",
   },
 ];
+
+export const mockChaptersByTopic: Record<string, ChapterItem[]> = {
+  arithmetic: [
+    { id: "chap-1", name: "NUMBER SYSTEM", slug: "number-system", videoCount: 2, completedVideos: 1, description: "Divisibility rules, unit digits, primes, remainder theorem" },
+    { id: "chap-2", name: "RATIO & PROPORTION", slug: "ratio-and-proportion", videoCount: 0, completedVideos: 0, description: "Direct and inverse proportions, partnership basics" },
+    { id: "chap-3", name: "AVERAGE", slug: "average", videoCount: 0, completedVideos: 0, description: "Weighted average, speed-time averages, consecutive numbers" },
+    { id: "chap-4", name: "PERCENTAGE", slug: "percentage", videoCount: 0, completedVideos: 0, description: "Fraction to percentage conversions, successive changes" },
+    { id: "chap-5", name: "PROFIT LOSS & DISCOUNT", slug: "profit-loss-and-discount", videoCount: 0, completedVideos: 0, description: "Cost price, marked price, successive discounts" },
+    { id: "chap-6", name: "SIMPLE INTEREST", slug: "simple-interest", videoCount: 0, completedVideos: 0, description: "Principal, rate of interest, SI formulas & short tricks" },
+    { id: "chap-7", name: "COMPOUND INTEREST", slug: "compound-interest", videoCount: 0, completedVideos: 0, description: "CI formula, effective rate method, CI vs SI differences" },
+  ],
+  algebra: [
+    { id: "chap-alg-1", name: "ALGEBRAIC IDENTITIES", slug: "algebraic-identities", videoCount: 1, completedVideos: 0 },
+    { id: "chap-alg-2", name: "LINEAR EQUATIONS", slug: "linear-equations", videoCount: 0, completedVideos: 0 },
+    { id: "chap-alg-3", name: "QUADRATIC EQUATIONS", slug: "quadratic-equations", videoCount: 0, completedVideos: 0 },
+  ],
+  geometry: [
+    { id: "chap-geo-1", name: "LINES & ANGLES", slug: "lines-and-angles", videoCount: 1, completedVideos: 0 },
+    { id: "chap-geo-2", name: "TRIANGLES & CONGRUENCE", slug: "triangles-congruence", videoCount: 0, completedVideos: 0 },
+    { id: "chap-geo-3", name: "CIRCLES & TANGENTS", slug: "circles-and-tangents", videoCount: 0, completedVideos: 0 },
+  ],
+  trigo: [
+    { id: "chap-tri-1", name: "TRIGONOMETRIC RATIOS & IDENTITIES", slug: "trigonometric-ratios", videoCount: 1, completedVideos: 1 },
+    { id: "chap-tri-2", name: "HEIGHTS AND DISTANCES", slug: "heights-and-distances", videoCount: 0, completedVideos: 0 },
+  ],
+  di: [
+    { id: "chap-di-1", name: "BAR CHARTS & HISTOGRAMS", slug: "bar-charts", videoCount: 0, completedVideos: 0 },
+    { id: "chap-di-2", name: "PIE CHARTS & TABULATION", slug: "pie-charts", videoCount: 0, completedVideos: 0 },
+  ],
+  "2d-3d": [
+    { id: "chap-mens-1", name: "2D MENSURATION: AREA & PERIMETER", slug: "2d-mensuration", videoCount: 0, completedVideos: 0 },
+    { id: "chap-mens-2", name: "3D MENSURATION: SURFACE AREA & VOLUME", slug: "3d-mensuration", videoCount: 0, completedVideos: 0 },
+  ],
+  "english-grammar": [
+    { id: "chap-eng-1", name: "TENSES & TIME", slug: "tenses-and-time", videoCount: 4, completedVideos: 2 },
+    { id: "chap-eng-2", name: "VOICE CHANGE", slug: "voice-change", videoCount: 3, completedVideos: 1 },
+    { id: "chap-eng-3", name: "NARRATION CHANGE", slug: "narration-change", videoCount: 3, completedVideos: 1 },
+    { id: "chap-eng-4", name: "SUBJECT VERB AGREEMENT", slug: "subject-verb-agreement", videoCount: 2, completedVideos: 0 },
+  ],
+};
+
+export const mockVideosByChapter: Record<string, VideoLesson[]> = {
+  "number-system": [
+    {
+      id: "vid-ns-1",
+      chapterSlug: "number-system",
+      title: "NUMBER SYSTEM 1",
+      durationFormatted: "42 mins",
+      durationMinutes: 42,
+      thumbnailPattern: "teal-geometric",
+      isLocked: false, // Free preview class
+      order: 1,
+      facultyName: "Tutopia Math Faculty",
+      videoUrl: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+    },
+    {
+      id: "vid-ns-2",
+      chapterSlug: "number-system",
+      title: "NUMBER SYSTEM 2",
+      durationFormatted: "38 mins",
+      durationMinutes: 38,
+      thumbnailPattern: "teal-geometric",
+      isLocked: true, // Subscription locked
+      order: 2,
+      facultyName: "Tutopia Math Faculty",
+    },
+    {
+      id: "vid-ns-3",
+      chapterSlug: "number-system",
+      title: "NUMBER SYSTEM 3",
+      durationFormatted: "45 mins",
+      durationMinutes: 45,
+      thumbnailPattern: "teal-geometric",
+      isLocked: true,
+      order: 3,
+      facultyName: "Tutopia Math Faculty",
+    },
+    {
+      id: "vid-ns-4",
+      chapterSlug: "number-system",
+      title: "NUMBER SYSTEM 4",
+      durationFormatted: "50 mins",
+      durationMinutes: 50,
+      thumbnailPattern: "teal-geometric",
+      isLocked: true,
+      order: 4,
+      facultyName: "Tutopia Math Faculty",
+    },
+    {
+      id: "vid-ns-5",
+      chapterSlug: "number-system",
+      title: "NUMBER SYSTEM 5",
+      durationFormatted: "36 mins",
+      durationMinutes: 36,
+      thumbnailPattern: "teal-geometric",
+      isLocked: true,
+      order: 5,
+      facultyName: "Tutopia Math Faculty",
+    },
+    {
+      id: "vid-ns-6",
+      chapterSlug: "number-system",
+      title: "NUMBER SYSTEM 6",
+      durationFormatted: "48 mins",
+      durationMinutes: 48,
+      thumbnailPattern: "teal-geometric",
+      isLocked: true,
+      order: 6,
+      facultyName: "Tutopia Math Faculty",
+    },
+  ],
+  "tenses-and-time": [
+    {
+      id: "vid-tense-1",
+      chapterSlug: "tenses-and-time",
+      title: "TENSES FOUNDATION & PRESENT TENSE",
+      durationFormatted: "35 mins",
+      durationMinutes: 35,
+      thumbnailPattern: "teal-geometric",
+      isLocked: false,
+      order: 1,
+      facultyName: "Tutopia English Faculty",
+    },
+    {
+      id: "vid-tense-2",
+      chapterSlug: "tenses-and-time",
+      title: "PAST & FUTURE TENSE MASTERCLASS",
+      durationFormatted: "40 mins",
+      durationMinutes: 40,
+      thumbnailPattern: "teal-geometric",
+      isLocked: true,
+      order: 2,
+      facultyName: "Tutopia English Faculty",
+    },
+  ],
+};
+

@@ -2,10 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Bell,
   Search,
-  GraduationCap,
   Command,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,20 +15,17 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
       <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
-        {/* Left Section: Brand Emblem & Search Bar */}
+        {/* Left Section: Brand Logo & Search Bar */}
         <div className="flex items-center gap-4 sm:gap-6">
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-8 h-8 rounded-md bg-sky-600 flex items-center justify-center text-white shadow-xs group-hover:bg-sky-700 transition-colors">
-              <GraduationCap className="w-5 h-5 stroke-[2.2]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-black tracking-wider uppercase text-slate-900 leading-none">
-                Tutopia<span className="text-sky-600">Exam</span>
-              </span>
-              <span className="text-[10px] text-slate-400 font-medium">
-                Web Portal v1.0
-              </span>
-            </div>
+          <Link href="/" className="flex items-center shrink-0 group py-1">
+            <Image
+              src="/images/logo-new.svg"
+              alt="Tutopia Exam"
+              width={140}
+              height={40}
+              className="h-8 sm:h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
+              priority
+            />
           </Link>
 
           {/* Left-Aligned Search Bar */}

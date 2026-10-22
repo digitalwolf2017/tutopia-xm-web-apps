@@ -123,8 +123,9 @@ export default function SubjectChapterGridPage() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">
                 {group.topics.map((topic) => (
-                  <div
+                  <Link
                     key={topic.id}
+                    href={`/subjects/${examCategory}/${topic.id}`}
                     className="p-3 rounded-md bg-slate-50 hover:bg-sky-50/60 border border-slate-200/70 hover:border-sky-200 transition-all duration-150 cursor-pointer flex flex-col justify-between min-h-[76px] group hover:-translate-y-0.5"
                   >
                     <span className="text-xs font-bold text-slate-800 group-hover:text-sky-700 transition-colors line-clamp-1">
@@ -139,7 +140,7 @@ export default function SubjectChapterGridPage() {
                         <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                       ) : null}
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

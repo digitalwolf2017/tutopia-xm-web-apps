@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { BookOpen, GraduationCap, Award, CheckCircle } from "lucide-react";
+import Image from "next/image";
+import { BookOpen, Award, CheckCircle } from "lucide-react";
 
 export default function AuthLayout({
   children,
@@ -16,19 +17,16 @@ export default function AuthLayout({
         <div className="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-amber-500/20 blur-3xl pointer-events-none"></div>
 
         {/* Top Brand Logo */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center text-slate-950 shadow-md">
-            <GraduationCap className="w-7 h-7 stroke-[2.2]" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-black tracking-tight text-white">
-              Tutopia Exam
-            </h1>
-            <p className="text-xs font-semibold text-sky-200">
-              তোমার স্বপ্ন, আমাদের অঙ্গীকার
-            </p>
-          </div>
-        </div>
+        <Link href="/" className="relative z-10 flex items-center">
+          <Image
+            src="/images/logo-new.svg"
+            alt="Tutopia Exam"
+            width={180}
+            height={50}
+            className="h-11 w-auto object-contain bg-white/95 px-3 py-1.5 rounded-lg shadow-sm"
+            priority
+          />
+        </Link>
 
         {/* Center Feature Highlights */}
         <div className="relative z-10 space-y-6 max-w-md">
@@ -64,14 +62,18 @@ export default function AuthLayout({
       <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           {/* Mobile Brand Header */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-400 text-slate-950 shadow-md mb-3">
-              <GraduationCap className="w-8 h-8 stroke-[2.2]" />
-            </div>
-            <h1 className="text-2xl font-black text-slate-900">
-              Tutopia Exam
-            </h1>
-            <p className="text-xs font-semibold text-sky-600 mt-0.5">
+          <div className="lg:hidden text-center mb-8 flex flex-col items-center">
+            <Link href="/" className="inline-block mb-2">
+              <Image
+                src="/images/logo-new.svg"
+                alt="Tutopia Exam"
+                width={160}
+                height={46}
+                className="h-10 w-auto object-contain"
+                priority
+              />
+            </Link>
+            <p className="text-xs font-semibold text-sky-600">
               চাকরির সেরা প্রস্তুতি প্ল্যাটফর্ম
             </p>
           </div>
