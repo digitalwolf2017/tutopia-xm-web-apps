@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { MobileBottomBar } from "@/components/layout/mobile-bottom-bar";
+import { AuthGuard } from "@/features/auth/auth-guard";
 
 export default function DashboardLayout({
   children,
@@ -10,7 +11,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <AuthGuard>
+      <div className="min-h-screen flex flex-col bg-slate-50">
       <AppHeader />
       <div className="flex-1 flex w-full">
         <AppSidebar />
@@ -49,5 +51,6 @@ export default function DashboardLayout({
       </div>
       <MobileBottomBar />
     </div>
+    </AuthGuard>
   );
 }
