@@ -10,8 +10,18 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { mockCurrentUser } from "@/lib/mock-data";
+import { useAuth } from "@/features/auth/auth-context";
 
 export function AppHeader() {
+  const { user } = useAuth();
+  const displayName = user?.name || mockCurrentUser.name;
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
       <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
@@ -81,11 +91,11 @@ export function AppHeader() {
           >
             <Avatar className="h-7 w-7 rounded-md border border-slate-200">
               <AvatarFallback className="bg-sky-50 text-sky-700 font-bold text-xs rounded-md">
-                AB
+                {initials}
               </AvatarFallback>
             </Avatar>
             <span className="hidden sm:inline-block text-xs font-semibold text-slate-800 group-hover:text-sky-600 transition-colors">
-              {mockCurrentUser.name}
+              {displayName}
             </span>
           </Link>
         </div>

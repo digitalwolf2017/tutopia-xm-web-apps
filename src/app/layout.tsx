@@ -30,6 +30,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
+import { AuthProvider } from "@/features/auth/auth-context";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.variable} font-sans min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col`}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

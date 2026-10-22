@@ -14,8 +14,10 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/auth/auth-context";
 
 export default function MoreSettingsPage() {
+  const { logout } = useAuth();
   const menuItems = [
     {
       label: "My profile",
@@ -78,14 +80,13 @@ export default function MoreSettingsPage() {
 
       {/* 3. Center Logout & App Version */}
       <div className="pt-8 text-center space-y-2">
-        <Link href="/login" className="inline-block">
-          <Button
-            variant="outline"
-            className="rounded-md px-6 h-8 border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-300 transition-all font-semibold text-xs"
-          >
-            Logout
-          </Button>
-        </Link>
+        <Button
+          variant="outline"
+          onClick={logout}
+          className="rounded-md px-6 h-8 border-slate-200 text-slate-700 hover:text-rose-600 hover:border-rose-300 transition-all font-semibold text-xs cursor-pointer"
+        >
+          Logout
+        </Button>
         <p className="text-[11px] text-slate-400 font-medium">Tutopia Exam Web • Version 1.0</p>
       </div>
     </div>
