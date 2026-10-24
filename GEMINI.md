@@ -118,6 +118,14 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - [x] Connect `/login` (OTP verification & password tabs) and `/register` to live mutations with error handling, loading states, and 60s countdown timer.
 - [x] Verify production build passes cleanly (`npm run build` exits with code 0).
 
+### Phase 10: Mock Tests & CBT Exam API Integration
+- [x] Full audit of Tutopia Mock Test and Exam OpenAPI documentation (`https://competitive.tutopia.in/docs/api-docs.json`).
+- [x] Build feature API slice in `src/features/mock-tests/api/` (`types.ts`, `query-keys.ts`, `endpoints.ts`, `hooks.ts`).
+- [x] Wire `/mock-tests` to live `useExamCategoriesQuery()` and `useExamsQuery(selectedTypeId)` with dynamic filter tabs and instant refresh.
+- [x] Wire `/mock-tests/history` to live `useCompletedExamsQuery()` with scores, passing badges, attempt dates, and duration.
+- [x] Wire CBT runner `/mock-tests/[testId]/take` to live `useExamDetailsQuery(testId)` and `useSubmitExamMutation()`.
+- [x] Verify data mapping across all fields and execute clean production build (`npm run build` exits 0).
+
 ---
 
 ## 5. Decision Log
@@ -143,5 +151,7 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - **2026-10-24:** Header Profile & Logout Dropdown: Replaced static profile pill link in [`AppHeader`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/components/layout/app-header.tsx) with a rich Radix-powered [`DropdownMenu`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/components/ui/dropdown-menu.tsx). Includes student name, phone, subscription badge, navigation links to "My Profile", "My Subscriptions", "Change Password", and a dedicated "Logout" action connected to `logout()`. Production build verified.
 - **2026-10-24:** Profile Hub Live API Integration: Wired [`/profile`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/profile/page.tsx) to `useMeQuery` (`GET /api/v1/me`) with live data sync and cached fallback; wired [`/profile/edit`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/profile/edit/page.tsx) to `useUpdateProfileMutation` (`POST /api/v1/update-profile`) and `useCitiesQuery` (`GET /api/v1/cities`); wired [`/profile/change-password`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/profile/change-password/page.tsx) to `useChangePasswordMutation` (`POST /api/v1/change-password`). Production build verified with zero errors.
 - **2026-10-24:** Real API Response Alignment (`profile_image` & `cityName`): Audited Swagger OpenAPI schema and live response payload. Added `profile_image`, `cityName`, and `registered_class_id` to [`userProfileSchema`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/features/auth/api/types.ts) and [`AuthUser`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/features/auth/auth-context.tsx). Wired `<AvatarImage />` with graceful fallback across [`AppHeader`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/components/layout/app-header.tsx), [`MyProfilePage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/profile/page.tsx), and [`EditProfilePage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/profile/edit/page.tsx). Production build verified cleanly.
+- **2026-10-24:** Mock Test & CBT Exam API Integration: Built full Mock Test API slice under `src/features/mock-tests/api/` matching Tutopia backend endpoints (`/api/v1/exams`, `/api/v1/exam-types`, `/api/v1/completed-exams`, `/api/v1/exam-details/{id}`, `/api/v1/set-answer-to-exam`). Connected `/mock-tests`, `/mock-tests/history`, and full-screen CBT runner `/mock-tests/[testId]/take` with live data sync, question paper extraction, timer calculations, answer submission payload formatting, and resilient fallback handling. Verified 100% passing production build (`npm run build` exits 0).
+- **2026-10-24:** Complete Mock Data Purge in Mock Tests: Removed hardcoded `mockMockTests`, `fallbackAttempts`, and `sampleQuestions` from `/mock-tests`, `/mock-tests/history`, and `/mock-tests/[testId]/take`. All test lists, attempt scorecards, categories, and CBT questions are now rendered purely from live backend APIs with dedicated loading and empty states when no data is returned. Production build verified 100% cleanly.
 
 

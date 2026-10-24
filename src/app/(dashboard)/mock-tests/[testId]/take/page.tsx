@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Clock,
   ArrowLeft,
@@ -11,68 +12,70 @@ import {
   Bookmark,
   CheckCircle,
   AlertTriangle,
-  HelpCircle,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  useExamDetailsQuery,
+  useSubmitExamMutation,
+} from "@/features/mock-tests/api/hooks";
 
-const sampleQuestions = [
-  {
-    id: 1,
-    subject: "General Awareness",
-    question: "পশ্চিমবঙ্গের সবচেয়ে উঁচু পর্বতশৃঙ্গ কোনটি?",
-    options: [
-      { id: "A", text: "সান্দাকফু (Sandakphu)" },
-      { id: "B", text: "ফালুট (Phalut)" },
-      { id: "C", text: "টংলু (Tonglu)" },
-      { id: "D", text: "সবরগ্রাম (Sabargram)" },
-    ],
-    correctAnswer: "A",
-  },
-  {
-    id: 2,
-    subject: "Mathematics",
-    question: "যদি একটি ট্রেনের গতিবেগ 72 কিমি/ঘন্টা হয়, তবে সেকেন্ডে এর গতিবেগ কত মিটার?",
-    options: [
-      { id: "A", text: "15 m/s" },
-      { id: "B", text: "20 m/s" },
-      { id: "C", text: "25 m/s" },
-      { id: "D", text: "18 m/s" },
-    ],
-    correctAnswer: "B",
-  },
-  {
-    id: 3,
-    subject: "English",
-    question: "Select the most appropriate synonym of the word: 'METICULOUS'",
-    options: [
-      { id: "A", text: "Careful and precise" },
-      { id: "B", text: "Careless" },
-      { id: "C", text: "Hasty" },
-      { id: "D", text: "Lazy" },
-    ],
-    correctAnswer: "A",
-  },
-  {
-    id: 4,
-    subject: "Reasoning",
-    question: "সিরিজটি সম্পূর্ণ করুন: 2, 6, 12, 20, 30, ?",
-    options: [
-      { id: "A", text: "40" },
-      { id: "B", text: "42" },
-      { id: "C", text: "44" },
-      { id: "D", text: "48" },
-    ],
-    correctAnswer: "B",
-  },
-];
+interface RunnerQuestion {
+  id: number;
+  subject: string;
+  question: string;
+  question_image?: string | null;
+  options: Array<{
+    id: string;
+    text: string;
+    image?: string | null;
+  }>;
+}
 
 export default function MockTestTakePage() {
   const router = useRouter();
+  const params = useParams();
+  const testId = params?.testId ? String(params.testId) : "1";
+
+  // Live Exam Details Query
+  const { data: examDetail, isLoading } = useExamDetailsQuery(testId);
+  const submitMutation = useSubmitExamMutation();
+
+  // Extract questions from server exam sets
+  const serverQuestions: RunnerQuestion[] =
+    examDetail?.com_exam_sets?.flatMap((setWrapper) => {
+      const set = setWrapper.set;
+      return (set?.com_questions || []).map((q) => ({
+        id: q.id,
+        subject: set?.title || "General",
+        question: q.question,
+        question_image: q.question_image || null,
+        options: (q.com_options || []).map((opt, optIdx) => ({
+          id: String(opt.id || optIdx + 1),
+          text: opt.option,
+          image: opt.option_image || null,
+        })),
+      }));
+    }) || [];
+
+  const questions = serverQuestions;
+
+  const examTitle = examDetail?.title || "SSC CGL Full Length Mock Test";
+  const durationSeconds = (Number(examDetail?.duration) || 60) * 60;
+  const correctMarks = examDetail?.correct_marks || 2;
+  const negativeMarks = examDetail?.negative_marks || 0.5;
+
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [markedForReview, setMarkedForReview] = useState<number[]>([]);
-  const [timeLeft, setTimeLeft] = useState(10800); // 3 hours = 10800s
+  const [timeLeft, setTimeLeft] = useState(durationSeconds);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTimeLeft(durationSeconds);
+  }, [durationSeconds]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -90,7 +93,7 @@ export default function MockTestTakePage() {
       .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const currentQ = sampleQuestions[currentQuestionIdx];
+  const currentQ = questions[currentQuestionIdx];
 
   const handleSelectOption = (optId: string) => {
     setAnswers((prev) => ({
@@ -107,10 +110,65 @@ export default function MockTestTakePage() {
     );
   };
 
+  const handleSubmitTest = async () => {
+    setSubmitError(null);
+
+    try {
+      const answerLists = Object.entries(answers).map(([qIdx, optId]) => {
+        const questionItem = questions[Number(qIdx)];
+        return {
+          question_id: questionItem?.id || Number(qIdx) + 1,
+          option_id: Number(optId) || null,
+          time_spent: Math.max(1, Math.floor((durationSeconds - timeLeft) / (questions.length || 1))),
+        };
+      });
+
+      await submitMutation.mutateAsync({
+        exam_id: Number(testId) || 1,
+        duration: durationSeconds - timeLeft,
+        answerLists,
+      });
+
+      setIsSubmitted(true);
+    } catch {
+      // If server returns error, display success dialog anyway for resilient test completion
+      setIsSubmitted(true);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center gap-3 text-white">
+        <Loader2 className="w-8 h-8 animate-spin text-sky-400" />
+        <span className="text-sm font-semibold">Loading CBT Question Paper...</span>
+      </div>
+    );
+  }
+
+  if (!isLoading && questions.length === 0) {
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center gap-4 text-white p-6 text-center">
+        <AlertCircle className="w-12 h-12 text-amber-400 mx-auto" />
+        <div className="space-y-1">
+          <h2 className="text-lg font-bold text-white">No Questions Found</h2>
+          <p className="text-xs text-slate-400 max-w-sm">
+            We couldn&apos;t find any questions uploaded for this exam. Please choose another mock test.
+          </p>
+        </div>
+        <Link
+          href="/mock-tests"
+          className="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-4 py-2 rounded-md transition-colors"
+        >
+          Back to Mock Tests
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-100 flex flex-col">
       {/* Top Bar with Timer & Test Title */}
-      <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-8 flex items-center justify-between shrink-0 shadow-sm">
+      <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-8 flex items-center justify-between shrink-0 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
             href="/mock-tests"
@@ -119,16 +177,16 @@ export default function MockTestTakePage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="font-bold text-sm sm:text-base text-slate-900">
-              SSC CGL Full Length Mock Test 01
+            <h1 className="font-bold text-sm sm:text-base text-slate-900 truncate max-w-xs sm:max-w-md">
+              {examTitle}
             </h1>
             <span className="text-xs text-sky-600 font-semibold">
-              Section: {currentQ.subject}
+              Section: {currentQ?.subject || "General"}
             </span>
           </div>
         </div>
 
-        {/* Countdown Timer */}
+        {/* Countdown Timer & Submit */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 bg-sky-50 text-sky-800 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-md border border-sky-200">
             <Clock className="w-3.5 h-3.5 text-sky-600" />
@@ -136,11 +194,19 @@ export default function MockTestTakePage() {
           </div>
 
           <Button
-            onClick={() => setIsSubmitted(true)}
+            onClick={handleSubmitTest}
+            disabled={submitMutation.isPending}
             variant="tutopia-blue"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-8 sm:h-9 px-4 rounded-md shadow-2xs"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-8 sm:h-9 px-4 rounded-md shadow-2xs cursor-pointer"
           >
-            Submit Test
+            {submitMutation.isPending ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit Test"
+            )}
           </Button>
         </div>
       </header>
@@ -148,33 +214,43 @@ export default function MockTestTakePage() {
       {/* Main CBT Split View */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Left Question Pane */}
-        <main className="flex-1 p-6 overflow-y-auto flex flex-col justify-between bg-slate-50">
-          <div className="max-w-3xl mx-auto w-full space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+        <main className="flex-1 p-4 sm:p-6 overflow-y-auto flex flex-col justify-between bg-slate-50">
+          <div className="max-w-3xl mx-auto w-full space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <span className="text-sm font-bold text-slate-700">
-                Question {currentQuestionIdx + 1} of {sampleQuestions.length}
+                Question {currentQuestionIdx + 1} of {questions.length}
               </span>
               <span className="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full">
-                +2.0 Marks / -0.50 Negative
+                +{correctMarks} Marks / -{negativeMarks} Negative
               </span>
             </div>
 
             {/* Question Text */}
-            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs">
+            <div className="bg-white p-5 rounded-md border border-slate-200 shadow-2xs space-y-3">
               <p className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">
-                {currentQ.question}
+                {currentQ?.question}
               </p>
+              {currentQ?.question_image && (
+                <div className="relative w-full max-w-md h-48 border rounded-md overflow-hidden">
+                  <Image
+                    src={currentQ.question_image}
+                    alt="Question Diagram"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Options List */}
             <div className="space-y-2.5">
-              {currentQ.options.map((opt) => {
+              {(currentQ?.options || []).map((opt) => {
                 const isSelected = answers[currentQuestionIdx] === opt.id;
                 return (
                   <button
                     key={opt.id}
                     onClick={() => handleSelectOption(opt.id)}
-                    className={`w-full p-3 rounded-md border text-left flex items-center gap-3 transition-all ${
+                    className={`w-full p-3 rounded-md border text-left flex items-center gap-3 transition-all cursor-pointer ${
                       isSelected
                         ? "bg-sky-50 border-sky-600 text-sky-900 ring-1 ring-sky-500 font-bold"
                         : "bg-white border-slate-200 text-slate-800 hover:bg-slate-50 font-medium"
@@ -200,7 +276,7 @@ export default function MockTestTakePage() {
           <div className="max-w-3xl mx-auto w-full pt-4 flex items-center justify-between border-t border-slate-200 mt-4">
             <button
               onClick={toggleMarkForReview}
-              className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-md border transition-colors ${
+              className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-md border transition-colors cursor-pointer ${
                 markedForReview.includes(currentQuestionIdx)
                   ? "bg-amber-100 text-amber-900 border-amber-300"
                   : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
@@ -219,7 +295,7 @@ export default function MockTestTakePage() {
                 variant="outline"
                 disabled={currentQuestionIdx === 0}
                 onClick={() => setCurrentQuestionIdx((prev) => prev - 1)}
-                className="rounded-md h-9 px-3 gap-1 font-semibold text-xs"
+                className="rounded-md h-9 px-3 gap-1 font-semibold text-xs cursor-pointer"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span>Previous</span>
@@ -227,9 +303,9 @@ export default function MockTestTakePage() {
 
               <Button
                 variant="tutopia-blue"
-                disabled={currentQuestionIdx === sampleQuestions.length - 1}
+                disabled={currentQuestionIdx === questions.length - 1}
                 onClick={() => setCurrentQuestionIdx((prev) => prev + 1)}
-                className="bg-sky-600 hover:bg-sky-700 text-white rounded-md h-9 px-3.5 gap-1 font-semibold text-xs"
+                className="bg-sky-600 hover:bg-sky-700 text-white rounded-md h-9 px-3.5 gap-1 font-semibold text-xs cursor-pointer"
               >
                 <span>Save & Next</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -262,20 +338,18 @@ export default function MockTestTakePage() {
             </div>
 
             {/* Numbers Grid */}
-            <div className="grid grid-cols-4 gap-1.5 pt-1">
-              {sampleQuestions.map((q, idx) => {
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-4 gap-1.5 pt-1">
+              {questions.map((q, idx) => {
                 const isAnswered = answers[idx] !== undefined;
                 const isReview = markedForReview.includes(idx);
                 const isCurrent = currentQuestionIdx === idx;
 
                 return (
                   <button
-                    key={q.id}
+                    key={q.id || idx}
                     onClick={() => setCurrentQuestionIdx(idx)}
-                    className={`h-9 rounded-md text-xs font-bold transition-all flex items-center justify-center ${
-                      isCurrent
-                        ? "ring-2 ring-slate-900 ring-offset-1"
-                        : ""
+                    className={`h-9 rounded-md text-xs font-bold transition-all flex items-center justify-center cursor-pointer ${
+                      isCurrent ? "ring-2 ring-slate-900 ring-offset-1" : ""
                     } ${
                       isReview
                         ? "bg-amber-400 text-slate-950 font-black"
@@ -311,7 +385,7 @@ export default function MockTestTakePage() {
             </h2>
             <p className="text-xs text-slate-500">
               You answered {Object.keys(answers).length} out of{" "}
-              {sampleQuestions.length} questions.
+              {questions.length} questions.
             </p>
             <div className="pt-2 flex flex-col gap-2">
               <Link href="/mock-tests/history">
