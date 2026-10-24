@@ -3,10 +3,10 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import { Lock, Sparkles, Check, X, ShieldAlert } from "lucide-react";
-import { VideoLesson } from "@/lib/mock-data";
+import { VideoLessonItem } from "@/features/subjects/api/types";
 
 interface LockSubscriptionDialogProps {
-  lesson: VideoLesson | null;
+  lesson: VideoLessonItem | null;
   chapterName: string;
   onClose: () => void;
 }

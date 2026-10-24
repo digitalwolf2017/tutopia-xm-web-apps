@@ -44,7 +44,7 @@ export function AppSidebar() {
       heading: "ACCOUNT",
       links: [
         { label: "My Profile", href: "/profile", icon: User, exact: true },
-        { label: "Subscriptions", href: "/profile/subscriptions", icon: CreditCard },
+        { label: "Subscriptions & Orders", href: "/profile/subscriptions", icon: CreditCard },
         { label: "Settings & Help", href: "/more", icon: Settings },
       ],
     },

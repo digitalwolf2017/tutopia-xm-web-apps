@@ -1,20 +1,46 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { X, Play, Volume2, ShieldCheck, Clock, BookOpen } from "lucide-react";
-import { VideoLesson } from "@/lib/mock-data";
+import {
+  X,
+  Play,
+  ShieldCheck,
+  Clock,
+  BookOpen,
+  Loader2,
+  FileText,
+  ExternalLink,
+} from "lucide-react";
+import { VideoLessonItem } from "@/features/subjects/api/types";
+import {
+  useVideoPlayQuery,
+  useChapterNotesQuery,
+} from "@/features/subjects/api/hooks";
 
 interface VideoPlayerDialogProps {
-  lesson: VideoLesson | null;
+  lesson: VideoLessonItem | null;
   chapterName: string;
   topicName: string;
+  chapterId?: string | number | null;
   onClose: () => void;
+}
+
+function formatDuration(duration: string | number | undefined): string {
+  if (!duration) return "0 mins";
+  const num = Number(duration);
+  if (isNaN(num) || num <= 0) return "0 mins";
+  if (num > 60) {
+    const mins = Math.floor(num / 60);
+    return `${mins} mins`;
+  }
+  return `${num} mins`;
 }
 
 export function VideoPlayerDialog({
   lesson,
   chapterName,
   topicName,
+  chapterId,
   onClose,
 }: VideoPlayerDialogProps) {
   useEffect(() => {
@@ -25,7 +51,28 @@ export function VideoPlayerDialog({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
+  const { data: videoData, isLoading: isLoadingVideo } = useVideoPlayQuery(
+    lesson?.id ?? null,
+    1
+  );
+
+  const { data: chapterNotes = [], isLoading: isLoadingNotes } =
+    useChapterNotesQuery(chapterId ?? null);
+
   if (!lesson) return null;
+
+  const videoStreamUrl = videoData?.video_url || lesson.videoUrl || null;
+  const lectureDuration = videoData?.duration
+    ? formatDuration(videoData.duration)
+    : lesson.durationFormatted || "0 mins";
+
+  const handleDownloadNotes = () => {
+    if (chapterNotes.length > 0 && chapterNotes[0].file) {
+      window.open(chapterNotes[0].file, "_blank");
+    } else {
+      alert(`Class notes for "${chapterName}" are being compiled by faculty and will be available soon.`);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-xs animate-in fade-in duration-200">
@@ -36,11 +83,11 @@ export function VideoPlayerDialog({
         {/* Top Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-slate-900/90 border-b border-slate-800 text-white">
           <div className="flex items-center gap-2 truncate pr-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <h3 className="text-sm font-bold text-white truncate">
               {lesson.title}
             </h3>
-            <span className="text-xs text-slate-400 hidden sm:inline">
+            <span className="text-xs text-slate-400 hidden sm:inline truncate">
               — {chapterName}
             </span>
           </div>
@@ -48,6 +95,7 @@ export function VideoPlayerDialog({
           <button
             onClick={onClose}
             className="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Close video player"
           >
             <X className="w-5 h-5" />
           </button>
@@ -55,16 +103,24 @@ export function VideoPlayerDialog({
 
         {/* Video Player Container (16:9 Aspect Ratio) */}
         <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden group">
-          {lesson.videoUrl ? (
-            <iframe
-              src={lesson.videoUrl}
-              title={lesson.title}
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+          {isLoadingVideo ? (
+            <div className="flex flex-col items-center justify-center gap-2 text-slate-400 text-xs">
+              <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
+              <span>Connecting to Tutopia video stream...</span>
+            </div>
+          ) : videoStreamUrl ? (
+            <video
+              controls
+              autoPlay
+              playsInline
+              src={videoStreamUrl}
+              poster={videoData?.thumb_url || lesson.thumbUrl || undefined}
+              className="w-full h-full object-contain bg-black"
+            >
+              Your browser does not support the video tag.
+            </video>
           ) : (
-            /* Fallback high-fidelity mock stream player */
+            /* High-fidelity Fallback Stage */
             <div className="w-full h-full bg-radial from-slate-900 via-slate-950 to-black flex flex-col items-center justify-center p-6 text-center text-white">
               <div className="w-16 h-16 rounded-full bg-sky-600/90 text-white flex items-center justify-center mb-3 shadow-lg group-hover:scale-105 transition-transform">
                 <Play className="w-8 h-8 fill-current ml-1" />
@@ -78,7 +134,7 @@ export function VideoPlayerDialog({
               <div className="flex items-center gap-3 mt-4 text-xs text-slate-400">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5 text-sky-400" />
-                  {lesson.durationFormatted}
+                  {lectureDuration}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
@@ -97,7 +153,7 @@ export function VideoPlayerDialog({
               Faculty: {lesson.facultyName || "Tutopia Senior Faculty"}
             </span>
             <span className="text-slate-400 text-[11px]">
-              Target: Combined Competitive Exams (SSC, RAIL, WBCS)
+              Duration: {lectureDuration} • Quality: 1080p Full HD
             </span>
           </div>
 
@@ -109,11 +165,23 @@ export function VideoPlayerDialog({
               Close
             </button>
             <button
-              onClick={() => alert("Class notes PDF will download when connected to Tutopia CDN.")}
-              className="px-3 py-1.5 rounded-md bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              onClick={handleDownloadNotes}
+              disabled={isLoadingNotes}
+              className="px-3 py-1.5 rounded-md bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+              title={chapterNotes.length > 0 ? "Download chapter PDF notes" : "Check for chapter notes"}
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Download Notes</span>
+              {isLoadingNotes ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : chapterNotes.length > 0 ? (
+                <ExternalLink className="w-3.5 h-3.5" />
+              ) : (
+                <BookOpen className="w-3.5 h-3.5" />
+              )}
+              <span>
+                {chapterNotes.length > 0
+                  ? `Notes (${chapterNotes.length} PDF)`
+                  : "Chapter Notes"}
+              </span>
             </button>
           </div>
         </div>
