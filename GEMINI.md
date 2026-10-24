@@ -160,6 +160,15 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - [x] Connect Card 2 on Dashboard Home page to `/exam-tracks`.
 - [x] Production build passes cleanly across all 20 routes (`npm run build` exits with code 0).
 
+### Phase 15: Subscriptions, Orders, and Wallet Credits Hub
+- [x] Full audit of Tutopia Subscription & Order OpenAPI endpoints (`/api/v1/subscription-plans`, `/api/v1/order-request`, `/api/v1/credit-orders`, `/api/v1/wallet`).
+- [x] Build feature API slice in `src/features/subscriptions/api/` (`types.ts`, `query-keys.ts`, `endpoints.ts`, `hooks.ts`).
+- [x] Create reusable UI components: `SubscriptionPlanCard`, `OrderRequestDialog`, `OrderHistoryList`, and `WalletCard`.
+- [x] Upgrade `/profile/subscriptions` into a unified Hub with 3 tabs: "Available Packages", "My Orders & Requests", and "Wallet & Credits".
+- [x] Provide instant assisted order callback requests via `POST /api/v1/order-request`.
+- [x] Update navigation links in `AppSidebar`, `AppHeader`, and `ProfilePage`.
+- [x] Production build passes cleanly across all 20 routes (`npm run build` exits with code 0).
+
 ---
 
 ## 5. Decision Log

@@ -205,7 +205,7 @@ export default function MyProfilePage() {
             className="w-full h-10 rounded-md text-xs sm:text-sm font-bold text-slate-950 bg-amber-400 hover:bg-amber-500 shadow-2xs gap-2 cursor-pointer"
           >
             <CreditCard className="w-4 h-4" />
-            <span>Manage Subscriptions & Plans</span>
+            <span>Manage Subscriptions & Orders</span>
           </Button>
         </Link>
 
