@@ -7,14 +7,28 @@ import {
   Bell,
   Search,
   Command,
+  ChevronDown,
+  User as UserIcon,
+  LogOut,
+  CreditCard,
+  KeyRound,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { mockCurrentUser } from "@/lib/mock-data";
 import { useAuth } from "@/features/auth/auth-context";
 
 export function AppHeader() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const displayName = user?.name || mockCurrentUser.name;
+  const profileImage = user?.profile_image || null;
   const initials = displayName
     .split(" ")
     .map((n) => n[0])
@@ -54,7 +68,7 @@ export function AppHeader() {
           </div>
         </div>
 
-        {/* Right Section: Live Badge, Notifications & Profile Pill */}
+        {/* Right Section: Live Badge, Notifications & Profile Dropdown */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Live Indicator Pill */}
           <Link
@@ -84,20 +98,113 @@ export function AppHeader() {
 
           <div className="h-4 w-px bg-slate-200" />
 
-          {/* Compact User Pill */}
-          <Link
-            href="/profile"
-            className="flex items-center gap-2 p-1 rounded-md hover:bg-slate-50 transition-colors group"
-          >
-            <Avatar className="h-7 w-7 rounded-md border border-slate-200">
-              <AvatarFallback className="bg-sky-50 text-sky-700 font-bold text-xs rounded-md">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden sm:inline-block text-xs font-semibold text-slate-800 group-hover:text-sky-600 transition-colors">
-              {displayName}
-            </span>
-          </Link>
+          {/* User Account Dropdown Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-100/80 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-sky-500/20 group data-[state=open]:bg-slate-100"
+              >
+                <Avatar className="h-7 w-7 rounded-md border border-slate-200">
+                  {profileImage && (
+                    <AvatarImage
+                      src={profileImage}
+                      alt={displayName}
+                      className="object-cover"
+                    />
+                  )}
+                  <AvatarFallback className="bg-sky-50 text-sky-700 font-bold text-xs rounded-md">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden sm:inline-block text-xs font-semibold text-slate-800 group-hover:text-sky-600 transition-colors max-w-[120px] truncate">
+                  {displayName}
+                </span>
+                <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-60 mt-1 p-1.5 shadow-xl border-slate-200">
+              {/* User Bio Header */}
+              <DropdownMenuLabel className="p-2 font-normal">
+                <div className="flex items-center gap-2.5">
+                  <Avatar className="h-9 w-9 rounded-md border border-slate-200 shrink-0">
+                    {profileImage && (
+                      <AvatarImage
+                        src={profileImage}
+                        alt={displayName}
+                        className="object-cover"
+                      />
+                    )}
+                    <AvatarFallback className="bg-sky-50 text-sky-700 font-bold text-xs rounded-md">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col space-y-0.5 overflow-hidden">
+                    <p className="text-xs font-bold text-slate-900 truncate">
+                      {displayName}
+                    </p>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      {user?.mobile || user?.phone || "+91 98765 43210"}
+                    </p>
+                    {user?.isSubscribed ? (
+                      <span className="inline-flex items-center w-fit px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200/80 mt-0.5">
+                        Pro Student
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center w-fit px-1.5 py-0.2 rounded text-[9px] font-bold bg-sky-50 text-sky-700 border border-sky-200/80 mt-0.5">
+                        Free Explorer
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+
+              <DropdownMenuSeparator />
+
+              {/* Menu Actions */}
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-semibold text-slate-700 rounded-md hover:bg-slate-100 cursor-pointer"
+                >
+                  <UserIcon className="w-4 h-4 text-sky-600" />
+                  <span>My Profile</span>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/profile/subscriptions"
+                  className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-semibold text-slate-700 rounded-md hover:bg-slate-100 cursor-pointer"
+                >
+                  <CreditCard className="w-4 h-4 text-amber-600" />
+                  <span>My Subscriptions</span>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/profile/change-password"
+                  className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-semibold text-slate-700 rounded-md hover:bg-slate-100 cursor-pointer"
+                >
+                  <KeyRound className="w-4 h-4 text-slate-500" />
+                  <span>Change Password</span>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              {/* Logout Action */}
+              <DropdownMenuItem
+                onClick={logout}
+                className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-md cursor-pointer focus:bg-rose-50 focus:text-rose-700"
+              >
+                <LogOut className="w-4 h-4 text-rose-600" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

@@ -1,23 +1,48 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { DummyUser, DUMMY_USERS } from "./dummy-users";
+import { useQueryClient } from "@tanstack/react-query";
+import { UserProfile } from "./api/types";
+import { authEndpoints } from "./api/endpoints";
+import { clearAuthStorage } from "@/lib/api-client";
+
+export interface AuthUser {
+  id: string | number;
+  name: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  mobile: string;
+  phone?: string;
+  email?: string | null;
+  profile_image?: string | null;
+  targetExam?: string;
+  subscriptionPlan?: string;
+  subscriptionValidUntil?: string;
+  city?: string | null;
+  cityNmae?: string | null;
+  cityName?: string | null;
+  badge?: string;
+  badgeColor?: string;
+  token?: string;
+  isSubscribed?: boolean;
+}
 
 interface AuthContextType {
-  user: DummyUser | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (mobileOrUser: string | DummyUser) => boolean;
+  setSession: (token: string, profile: UserProfile) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<DummyUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Check client storage for authenticated session
@@ -33,46 +58,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = (mobileOrUser: string | DummyUser) => {
-    let targetUser: DummyUser;
-    if (typeof mobileOrUser === "string") {
-      targetUser =
-        DUMMY_USERS.find((u) => u.mobile === mobileOrUser) || {
-          id: "custom-user",
-          name: "Tutopia Student",
-          mobile: mobileOrUser,
-          password: "password123",
-          otp: "123456",
-          targetExam: "SSC, RAIL, WBCS",
-          subscriptionPlan: "General Prep Pack",
-          subscriptionValidUntil: "31st Dec 2026",
-          city: "Kolkata",
-          badge: "Student",
-          badgeColor: "bg-sky-50 text-sky-700 border-sky-200/80",
-        };
-    } else {
-      targetUser = mobileOrUser;
-    }
+  const setSession = useCallback((token: string, profile: UserProfile) => {
+    const fullName =
+      [profile.first_name, profile.last_name].filter(Boolean).join(" ") ||
+      "Tutopia Student";
 
-    setUser(targetUser);
+    const resolvedCity = profile.cityName || profile.cityNmae || null;
+
+    const sessionUser: AuthUser = {
+      id: profile.id,
+      name: fullName,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
+      mobile: profile.phone,
+      phone: profile.phone,
+      email: profile.email,
+      profile_image: profile.profile_image || null,
+      city: resolvedCity,
+      cityName: resolvedCity,
+      cityNmae: resolvedCity,
+      isSubscribed: Boolean(profile.isSubscribed),
+      subscriptionPlan: profile.isSubscribed ? "Premium Enrolled" : "Free Explorer",
+      subscriptionValidUntil: "31st Dec 2026",
+      targetExam: "SSC, RAIL, WBCS",
+      badge: profile.isSubscribed ? "Pro Student" : "Student",
+      badgeColor: profile.isSubscribed
+        ? "bg-amber-50 text-amber-700 border-amber-200/80"
+        : "bg-sky-50 text-sky-700 border-sky-200/80",
+      token,
+    };
+
+    setUser(sessionUser);
     try {
-      localStorage.setItem("tutopia_auth_user", JSON.stringify(targetUser));
-      document.cookie = "tutopia_auth=true; path=/; max-age=86400";
+      localStorage.setItem("tutopia_auth_user", JSON.stringify(sessionUser));
+      localStorage.setItem("tutopia_auth_token", token);
+      document.cookie = `tutopia_auth_token=${token}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = "tutopia_auth=true; path=/; max-age=86400; SameSite=Lax";
     } catch (e) {
-      console.error("Storage error", e);
+      console.error("Session storage error", e);
     }
-    return true;
-  };
+  }, []);
 
   const logout = () => {
+    // 1. Revoke token on backend (best-effort)
+    authEndpoints.logout().catch(() => {});
+
+    // 2. Clear state and cache immediately
     setUser(null);
-    try {
-      localStorage.removeItem("tutopia_auth_user");
-      document.cookie = "tutopia_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    } catch (e) {
-      console.error("Storage error", e);
-    }
-    router.push("/login");
+    clearAuthStorage();
+    queryClient.clear();
+
+    // 3. Navigate to login
+    router.replace("/login");
   };
 
   return (
@@ -81,7 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isAuthenticated: !!user,
         isLoading,
-        login,
+        setSession,
         logout,
       }}
     >

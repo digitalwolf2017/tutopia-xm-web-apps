@@ -39,7 +39,7 @@ src/features/<feature>/
 All outbound network requests must go through the shared `apiClient` utility. Direct invocation of `window.fetch` or `axios` inside components is strictly prohibited.
 
 ### Key Capabilities
-1. **Base URL Resolution**: Resolves `process.env.NEXT_PUBLIC_API_URL` with a sensible fallback to `/api`.
+1. **Base URL Resolution**: Resolves `process.env.NEXT_PUBLIC_API_BASE_URL` with a sensible fallback to `/api`.
 2. **Bearer Token Interception**:
    - Automatically retrieves the authentication token (from secure cookies or auth state).
    - Injects `Authorization: Bearer <token>` into headers when an active token exists.
@@ -136,3 +136,62 @@ export const mockTestKeys = {
    - Keep mock datasets synchronized with Zod schemas in `types.ts`.
 2. **Offline & Network Drop Protection (CBT Runner)**:
    - For Mock Test question submission, serialize answer state to `localStorage` before emitting the mutation to prevent answer loss on sudden connection drops.
+
+---
+
+## 8. Code & Performance Optimization Rules
+
+1. **Request Deduplication & AbortController Cancellation**:
+   - Pass TanStack Query's automatic `signal` into `apiClient` to cancel in-flight network requests when a user navigates away or switches tabs rapidly:
+     ```ts
+     export function useSubjectsQuery() {
+       return useQuery({
+         queryKey: subjectKeys.lists(),
+         queryFn: ({ signal }) => fetchSubjects({ signal }),
+       });
+     }
+     ```
+   - `apiClient` ignores canceled `AbortError`s cleanly without logging false network alerts.
+
+2. **Debounce Search & Dynamic Filtering**:
+   - Never trigger an API call on every keystroke (e.g., live topic search, chapter filter, pincode lookup).
+   - Use a `300ms - 400ms` debounce threshold before updating query key filter params.
+
+3. **Selective Re-rendering with the `select` Option**:
+   - When a component only requires a subset or transformed slice of an API response, use TanStack Query's `select` option:
+     ```ts
+     // Re-renders ONLY when the count of active live batches changes
+     const { data: liveCount } = useLiveBatchesQuery({
+       select: (batches) => batches.filter((b) => b.isLive).length,
+     });
+     ```
+   - Leverages structural sharing to prevent unnecessary virtual DOM reconciliation.
+
+4. **Intent-Based Prefetching (Hover & Route Prediction)**:
+   - Prefetch target data when a student hovers over high-probability actions (e.g., hovering over a Mock Test card or Chapter item):
+     ```ts
+     const onHoverTest = (testId: string) => {
+       queryClient.prefetchQuery({
+         queryKey: mockTestKeys.detail(testId),
+         queryFn: () => getMockTestDetail(testId),
+         staleTime: 1000 * 60,
+       });
+     };
+     ```
+
+5. **Eliminate Request Waterfalls (Parallel Fetching)**:
+   - Avoid chaining sequential `await` calls if requests are independent.
+   - In components needing multiple queries, declare multiple `useQuery` hooks or use `useQueries` for parallel execution:
+     ```ts
+     // Runs concurrently in parallel, not sequentially
+     const userQuery = useMeQuery();
+     const citiesQuery = useCitiesQuery();
+     ```
+
+6. **Derive State Instead of Duplicating in `useState`**:
+   - Do NOT mirror query responses into local `useState` (e.g., `useEffect(() => setState(data), [data])`).
+   - Treat the query cache as the single source of truth. Only use local state for uncommitted form inputs.
+
+7. **Garbage Collection & Memory Hygiene (`gcTime`)**:
+   - Balance cache availability with browser memory consumption.
+   - Configure `gcTime: 1000 * 60 * 30` (30 minutes) for heavy static resources, and short `gcTime: 1000 * 60 * 5` for ephemeral test runs so memory is released promptly.

@@ -79,18 +79,48 @@ function buildRequestUrl(endpoint: string): URL {
 /**
  * Helper to retrieve stored auth token on the client
  */
+/**
+ * Helper to retrieve stored auth token on the client
+ */
 function getClientToken(): string | null {
   if (typeof window === 'undefined') return null;
 
   try {
+    const rawToken = localStorage.getItem('tutopia_auth_token');
+    if (rawToken && rawToken.trim()) return rawToken.trim();
+
     const rawUser = localStorage.getItem('tutopia_auth_user');
     if (rawUser) {
       const parsed = JSON.parse(rawUser);
-      if (parsed?.token) return parsed.token;
+      if (parsed?.token && typeof parsed.token === 'string') return parsed.token.trim();
     }
-    return localStorage.getItem('tutopia_auth_token');
+
+    // Check cookie fallback
+    const cookieMatch = document.cookie.match(/(?:^|;\s*)tutopia_auth_token=([^;]+)/);
+    if (cookieMatch && cookieMatch[1]) {
+      return decodeURIComponent(cookieMatch[1]);
+    }
+
+    return null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Safely clears all auth tokens and session cookies
+ */
+export function clearAuthStorage() {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.removeItem('tutopia_auth_user');
+    localStorage.removeItem('tutopia_auth_token');
+    sessionStorage.clear();
+    document.cookie = 'tutopia_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; SameSite=Lax';
+    document.cookie = 'tutopia_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; SameSite=Lax';
+  } catch (e) {
+    console.error('Failed to clear session', e);
   }
 }
 
@@ -100,12 +130,16 @@ function getClientToken(): string | null {
 function handleUnauthorized() {
   if (typeof window === 'undefined') return;
 
-  try {
-    localStorage.removeItem('tutopia_auth_user');
-    localStorage.removeItem('tutopia_auth_token');
-    document.cookie = 'tutopia_auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  } catch (e) {
-    console.error('Failed to clear session', e);
+  clearAuthStorage();
+
+  const pathname = window.location.pathname;
+  // Never kick to /login if user is deliberately on /register or another public auth route
+  if (
+    pathname.includes('/login') ||
+    pathname.includes('/register') ||
+    pathname.includes('/forgot-password')
+  ) {
+    return;
   }
 
   const currentPath = window.location.pathname + window.location.search;
@@ -183,14 +217,37 @@ async function request<T>(
       throw new AppApiError(message, response.status, code, details);
     }
 
-    // Unpack standard envelope if present: { success: true, data: T }
-    if (responseData && typeof responseData === 'object' && 'data' in responseData) {
-      return (responseData as ApiResponse<T>).data;
+    // Process structured JSON response
+    if (responseData && typeof responseData === 'object') {
+      const respObj = responseData as Record<string, unknown>;
+
+      // Catch backend errors returned with HTTP 200 (e.g. status: false)
+      if (respObj.status === false || respObj.success === false) {
+        const errorMsg =
+          (typeof respObj.message === 'string' && respObj.message.trim()) ||
+          (typeof respObj.error === 'string' && respObj.error.trim()) ||
+          'Operation failed';
+        throw new AppApiError(errorMsg, response.status || 400, 'API_ERROR');
+      }
+
+      // If response includes an authentication token, return the full payload
+      if ('token' in respObj && respObj.token) {
+        return responseData as T;
+      }
+
+      // If response has a wrapped data property, unpack it
+      if ('data' in respObj && respObj.data !== undefined && respObj.data !== null) {
+        return respObj.data as T;
+      }
     }
 
     return responseData as T;
   } catch (error) {
     if (error instanceof AppApiError) {
+      throw error;
+    }
+    // Allow TanStack Query cancellation (AbortController) to bubble cleanly
+    if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('aborted'))) {
       throw error;
     }
     throw new AppApiError(
