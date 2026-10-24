@@ -73,7 +73,7 @@ function SubscriptionsContent() {
   }, [plans, searchQuery, selectedCategory]);
 
   return (
-    <div className="space-y-6 w-full max-w-5xl pb-16">
+    <div className="space-y-6 w-full pb-16">
       {/* Top Header */}
       <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-slate-200/70">
         <div className="flex items-center gap-2.5">
@@ -203,36 +203,38 @@ function SubscriptionsContent() {
         {/* Search & Board Filter Bar (Visible when on Plans tab) */}
         {activeTab === "plans" && (
           <div className="space-y-2.5 pt-1">
-            <div className="relative w-full">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search packages by title or category..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-sky-500 text-slate-800 shadow-2xs"
-              />
-            </div>
-
-            {/* Board / Track Filter Pills Slider */}
-            {boardCategories.length > 2 && (
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none snap-x">
-                {boardCategories.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer snap-start ${
-                      selectedCategory === cat
-                        ? "bg-slate-900 text-white shadow-2xs"
-                        : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="relative w-full sm:max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search packages by title or category..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-9 pr-3.5 py-2 text-xs rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-sky-500 text-slate-800 shadow-2xs"
+                />
               </div>
-            )}
+
+              {/* Board / Track Filter Pills Slider */}
+              {boardCategories.length > 2 && (
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none snap-x">
+                  {boardCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setSelectedCategory(cat)}
+                      className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer snap-start ${
+                        selectedCategory === cat
+                          ? "bg-slate-900 text-white shadow-2xs"
+                          : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -241,8 +243,8 @@ function SubscriptionsContent() {
       {activeTab === "plans" && (
         <div className="space-y-4 pt-1">
           {isPlansLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
                   className="h-80 bg-slate-100 rounded-lg animate-pulse border border-slate-200"
@@ -258,7 +260,7 @@ function SubscriptionsContent() {
               </p>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
               {filteredPlans.map((plan, idx) => (
                 <SubscriptionPlanCard
                   key={plan.plan_id || idx}
@@ -304,7 +306,7 @@ export default function SubscriptionsPage() {
   return (
     <Suspense
       fallback={
-        <div className="p-6 space-y-4 max-w-5xl">
+        <div className="space-y-4 w-full">
           <div className="h-8 w-48 bg-slate-100 rounded animate-pulse" />
           <div className="h-44 bg-slate-100 rounded-lg animate-pulse" />
         </div>
