@@ -16,7 +16,6 @@ import {
   Clock,
   ArrowRight,
   ChevronLeft,
-  RefreshCw,
   Loader2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -24,33 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { useHomeFeedQuery } from "@/features/home/api/hooks";
 import { HomeCategoryType } from "@/features/home/api/types";
 
-// Helper for routing category cards to matching subject streams
-const getCategoryHref = (cat: { id: number; title: string }) => {
-  const normalized = cat.title.toLowerCase();
-  if (
-    normalized.includes("ssc") ||
-    normalized.includes("rail") ||
-    normalized.includes("wbcs")
-  ) {
-    return "/subjects/ssc-rail-wbcs";
-  }
-  if (normalized.includes("bank")) {
-    return "/subjects/all-bank-exams";
-  }
-  if (normalized.includes("portal")) {
-    return "/subjects/exams-portal";
-  }
-  if (normalized.includes("9 to 12") || normalized.includes("class 9")) {
-    return "/subjects/gk-class-9-12";
-  }
-  if (normalized.includes("one line")) {
-    return "/subjects/one-line-gk";
-  }
-  return `/subjects?type_id=${cat.id}`;
-};
-
 export default function HomePage() {
-  const { data: homeFeed, isLoading, refetch, isRefetching } = useHomeFeedQuery();
+  const { data: homeFeed, isLoading } = useHomeFeedQuery();
 
   // Extract sliders & video class categories from feed
   const sliderItem = homeFeed?.find(
@@ -198,18 +172,6 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => refetch()}
-              disabled={isLoading || isRefetching}
-              className="p-1 rounded-md text-slate-400 hover:text-sky-600 hover:bg-slate-100 transition-colors cursor-pointer"
-              title="Refresh home feed"
-            >
-              <RefreshCw
-                className={`w-3.5 h-3.5 ${
-                  isLoading || isRefetching ? "animate-spin text-sky-600" : ""
-                }`}
-              />
-            </button>
             <Link
               href="/subjects"
               className="text-xs font-semibold text-sky-600 hover:underline"
@@ -234,7 +196,7 @@ export default function HomePage() {
             {liveCategories.map((cat) => (
               <Link
                 key={cat.id}
-                href={getCategoryHref(cat)}
+                href={`/subjects/${cat.id}`}
                 className="group block"
               >
                 <Card className="h-full flex flex-col items-center justify-center text-center p-4 sm:p-5 bg-white hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-pointer min-h-[145px]">

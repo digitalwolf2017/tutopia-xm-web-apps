@@ -8,7 +8,6 @@ import {
   Clock,
   RotateCcw,
   Loader2,
-  RefreshCw,
   FileQuestion,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -17,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCompletedExamsQuery } from "@/features/mock-tests/api/hooks";
 
 export default function MockTestHistoryPage() {
-  const { data: completedExams, isLoading, refetch, isRefetching } =
+  const { data: completedExams, isLoading } =
     useCompletedExamsQuery();
 
   const displayList =
@@ -63,16 +62,6 @@ export default function MockTestHistoryPage() {
           </div>
         </div>
 
-        <button
-          onClick={() => refetch()}
-          disabled={isLoading || isRefetching}
-          className="p-1.5 rounded-md text-slate-500 hover:text-sky-600 hover:bg-slate-100 transition-colors cursor-pointer"
-          title="Refresh history"
-        >
-          <RefreshCw
-            className={`w-4 h-4 ${isLoading || isRefetching ? "animate-spin text-sky-600" : ""}`}
-          />
-        </button>
       </div>
 
       {isLoading && (

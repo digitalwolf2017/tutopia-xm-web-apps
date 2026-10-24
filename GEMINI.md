@@ -126,6 +126,24 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - [x] Wire CBT runner `/mock-tests/[testId]/take` to live `useExamDetailsQuery(testId)` and `useSubmitExamMutation()`.
 - [x] Verify data mapping across all fields and execute clean production build (`npm run build` exits 0).
 
+### Phase 11: Home Feed Live Integration
+- [x] Build feature API slice in `src/features/home/api/` (`types.ts`, `query-keys.ts`, `endpoints.ts`, `hooks.ts`) for `GET /api/v1/home`.
+- [x] Connect dashboard carousel to real Tutopia CDN banner sliders with auto-advance and manual controls.
+- [x] Map Video Classes grid to live `types` categories (`SSC, RAIL, WBCS`, `Exams Portal`, `All Bank Exams`, `GK 9-12`, `One Line GK`).
+- [x] Completely purge mock promo cards and mock batches from Home feed.
+
+### Phase 12: Subjects, Chapters & Video Lectures Live API Integration & Full Mock Data Purge
+- [x] Full audit of Tutopia OpenAPI specs for `chapters`, `tutorials`, and `video-play`.
+- [x] Build feature API slice in `src/features/subjects/api/` (`types.ts`, `query-keys.ts`, `endpoints.ts`, `hooks.ts`).
+- [x] Wire `/subjects` to live `useCompetitiveTypesQuery()` with real CDN icons and refresh actions.
+- [x] Wire `/subjects/[examCategory]` to live `useCompetitiveTypeDetailQuery(typeId)` with real exam tracks, dynamic subject categories, chapter counters, and live topic search.
+- [x] Wire `/subjects/[examCategory]/[subjectSlug]` to live `useChaptersQuery(subjectId)` with dynamic sibling topic pills, chapter cards, video counts, and practice question counters.
+- [x] Wire `/subjects/[examCategory]/[subjectSlug]/[chapterSlug]` to live `useTutorialsQuery(chapterId)` with CDN thumbnails, duration formatting, top-right chapter switcher dropdown, and lock/play modal dialogs.
+- [x] Wire `/chapter-mcq` to live `useCompetitiveTypeDetailQuery(23)` with real syllabus topics.
+- [x] Wire `AppHeader` and `/profile/subscriptions` directly to live `useAuth()` session.
+- [x] Complete purge of mock data imports across all subject routes, components, and headers.
+- [x] Production build passes cleanly across all 19 routes (`npm run build` exits with code 0).
+
 ---
 
 ## 5. Decision Log
@@ -154,5 +172,10 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - **2026-10-24:** Mock Test & CBT Exam API Integration: Built full Mock Test API slice under `src/features/mock-tests/api/` matching Tutopia backend endpoints (`/api/v1/exams`, `/api/v1/exam-types`, `/api/v1/completed-exams`, `/api/v1/exam-details/{id}`, `/api/v1/set-answer-to-exam`). Connected `/mock-tests`, `/mock-tests/history`, and full-screen CBT runner `/mock-tests/[testId]/take` with live data sync, question paper extraction, timer calculations, answer submission payload formatting, and resilient fallback handling. Verified 100% passing production build (`npm run build` exits 0).
 - **2026-10-24:** Complete Mock Data Purge in Mock Tests: Removed hardcoded `mockMockTests`, `fallbackAttempts`, and `sampleQuestions` from `/mock-tests`, `/mock-tests/history`, and `/mock-tests/[testId]/take`. All test lists, attempt scorecards, categories, and CBT questions are now rendered purely from live backend APIs with dedicated loading and empty states when no data is returned. Production build verified 100% cleanly.
 - **2026-10-24:** Home Feed Live API Integration: Built feature API slice under `src/features/home/api/` (`types.ts`, `query-keys.ts`, `endpoints.ts`, `hooks.ts`) for `GET /api/v1/home`. Connected dashboard (`/(dashboard)/page.tsx`) to real CDN banner sliders with auto-advance carousel and manual controls, live Video Classes category stream thumbnails (`SSC, RAIL, WBCS`, `Exams Portal`, `All Bank Exams`, `GK Class 9 to 12`, `One Line GK`), and on-demand live refetch trigger. Verified 100% passing production build.
+- **2026-10-24:** Complete Mock Data Purge across Subjects, Chapters & Video Lectures: Removed all hardcoded mock arrays (`mockSubjectHierarchy`, `mockChaptersByTopic`, `mockVideosByChapter`, `mockVideoClassCategories`) from `/subjects`, `/subjects/[examCategory]`, `/subjects/[examCategory]/[subjectSlug]`, `/subjects/[examCategory]/[subjectSlug]/[chapterSlug]`, `/chapter-mcq`, and removed `mockCurrentUser` from `AppHeader` and `/profile/subscriptions`. Wired all pages to live endpoints (`GET /api/v1/competitive-types`, `GET /api/v1/competitive-type-details/{id}`, `GET /api/v1/chapters/{subjectId}`, `GET /api/v1/chapter-tutorials/{chapterId}/{type}`). Verified 100% clean production build pass across all 19 routes.
+- **2026-10-24:** Chapter Playlist Header Streamlining: Removed the top-right chapter switcher dropdown button and refresh button from [`ChapterVideosPlaylistPage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/[chapterSlug]/page.tsx). Cleaned up unused state and imports, leaving a clean breadcrumb navigation header. Production build verified cleanly (`npm run build` exits 0).
+- **2026-10-24:** Chapter List Header Streamlining: Removed the reload/refresh button from [`SubjectChapterListPage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/page.tsx). Cleaned up unused `RefreshCw` import and query states. Production build verified cleanly (`npm run build` exits 0).
+- **2026-10-24:** Pure Dynamic API ID Routing (Zero Hardcoded Slugs/IDs): Completely eliminated `resolveTypeId` and `getCategoryHref` mapping functions across [`HomePage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/page.tsx), [`SubjectsCategoriesPage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/page.tsx), [`SubjectChapterGridPage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/page.tsx), [`SubjectChapterListPage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/page.tsx), [`ChapterVideosPlaylistPage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/subjects/[examCategory]/[subjectSlug]/[chapterSlug]/page.tsx), and [`ChapterMcqPage`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/chapter-mcq/page.tsx). Routes and API calls now consume purely dynamic backend IDs (`cat.id`, `sub.id`, `chap.id`) directly. Production build verified cleanly (`npm run build` exits 0).
+- **2026-10-24:** Global Removal of Reload / Refresh Buttons: Removed all manual reload/refresh buttons across the application (Home, Video Classes, Subject Tracks, Chapter Listing, Video Lectures, Chapter MCQ, Mock Tests, Mock Test History, and Student Profile). Cleaned up unused `RefreshCw` imports and state. Removed duplicate `public/favicon.ico` resolving Next.js App Router metadata warning. Verified 100% clean production build (`rm -rf .next && npm run build` exits 0).
 
 

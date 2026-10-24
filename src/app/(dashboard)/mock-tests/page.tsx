@@ -12,7 +12,6 @@ import {
   Play,
   RotateCcw,
   Loader2,
-  RefreshCw,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,8 +31,6 @@ export default function MockTestsPage() {
   const {
     data: serverExams,
     isLoading: isLoadingExams,
-    refetch,
-    isRefetching,
   } = useExamsQuery(selectedTypeId);
 
   // Dynamic categories from server
@@ -94,17 +91,6 @@ export default function MockTestsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Live Sync Button */}
-          <button
-            onClick={() => refetch()}
-            disabled={isLoadingExams || isRefetching}
-            className="p-1.5 rounded-md text-slate-500 hover:text-sky-600 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Refresh test lists"
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${isLoadingExams || isRefetching ? "animate-spin text-sky-600" : ""}`}
-            />
-          </button>
 
           <Link
             href="/mock-tests/history"

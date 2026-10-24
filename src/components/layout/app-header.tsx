@@ -22,12 +22,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { mockCurrentUser } from "@/lib/mock-data";
 import { useAuth } from "@/features/auth/auth-context";
 
 export function AppHeader() {
   const { user, logout } = useAuth();
-  const displayName = user?.name || mockCurrentUser.name;
+  const displayName = user?.name || "Student";
   const profileImage = user?.profile_image || null;
   const initials = displayName
     .split(" ")

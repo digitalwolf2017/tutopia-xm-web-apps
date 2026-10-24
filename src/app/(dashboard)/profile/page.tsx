@@ -13,7 +13,6 @@ import {
   KeyRound,
   Edit3,
   Loader2,
-  RefreshCw,
   AlertCircle,
   ShieldCheck,
 } from "lucide-react";
@@ -70,16 +69,6 @@ export default function MyProfilePage() {
           </div>
         </div>
 
-        {/* Live Refresh Button */}
-        <button
-          onClick={() => refetch()}
-          disabled={isLoading}
-          title="Refresh profile data"
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-md border border-slate-200 transition-colors cursor-pointer disabled:opacity-50"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-          <span className="hidden sm:inline">Sync</span>
-        </button>
       </div>
 
       {/* Error state alert if API fails */}

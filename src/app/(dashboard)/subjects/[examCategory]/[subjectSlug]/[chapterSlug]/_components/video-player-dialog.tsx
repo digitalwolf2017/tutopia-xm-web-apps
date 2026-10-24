@@ -2,10 +2,10 @@
 
 import React, { useEffect } from "react";
 import { X, Play, Volume2, ShieldCheck, Clock, BookOpen } from "lucide-react";
-import { VideoLesson } from "@/lib/mock-data";
+import { VideoLessonItem } from "@/features/subjects/api/types";
 
 interface VideoPlayerDialogProps {
-  lesson: VideoLesson | null;
+  lesson: VideoLessonItem | null;
   chapterName: string;
   topicName: string;
   onClose: () => void;
