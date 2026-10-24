@@ -16,7 +16,6 @@ import {
   AlertCircle,
   FileText,
   ExternalLink,
-  ListChecks,
 } from "lucide-react";
 import {
   useChaptersQuery,
@@ -152,31 +151,20 @@ export default function ChapterVideosPlaylistPage() {
           </div>
         </div>
 
-        {/* Action Buttons: Practice MCQs & Class Notes */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <Link
-            href={`/subjects/${examCategory}/${subjectId}/${activeChapterId}/practice`}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all active:scale-[0.98]"
-            title="Practice Chapter MCQs"
+        {/* Class Notes PDF Download Action */}
+        {chapterNotes.length > 0 && chapterNotes[0].file && (
+          <a
+            href={chapterNotes[0].file}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/90 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all active:scale-[0.98]"
+            title="Download Chapter Class Notes (PDF)"
           >
-            <ListChecks className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Practice MCQs</span>
-          </Link>
-
-          {chapterNotes.length > 0 && chapterNotes[0].file && (
-            <a
-              href={chapterNotes[0].file}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/90 text-xs font-semibold shadow-2xs hover:shadow-xs transition-all active:scale-[0.98]"
-              title="Download Chapter Class Notes (PDF)"
-            >
-              <FileText className="w-3.5 h-3.5 text-amber-600" />
-              <span>Class Notes ({chapterNotes.length} PDF)</span>
-              <ExternalLink className="w-3 h-3 text-amber-500" />
-            </a>
-          )}
-        </div>
+            <FileText className="w-3.5 h-3.5 text-amber-600" />
+            <span>Class Notes ({chapterNotes.length} PDF)</span>
+            <ExternalLink className="w-3 h-3 text-amber-500" />
+          </a>
+        )}
       </div>
 
       {/* 2. Topic & Chapter Subtitle Heading */}
