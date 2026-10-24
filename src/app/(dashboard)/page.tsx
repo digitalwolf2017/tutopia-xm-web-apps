@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ListChecks,
   MessageSquare,
@@ -14,116 +15,133 @@ import {
   PhoneCall,
   Clock,
   ArrowRight,
+  ChevronLeft,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  mockPromoBanners,
-  mockVideoClassCategories,
-  mockLiveBatches,
-} from "@/lib/mock-data";
+import { mockLiveBatches } from "@/lib/mock-data";
+import { useHomeFeedQuery } from "@/features/home/api/hooks";
+import { HomeCategoryType } from "@/features/home/api/types";
+
+// Helper for routing category cards to matching subject streams
+const getCategoryHref = (cat: { id: number; title: string }) => {
+  const normalized = cat.title.toLowerCase();
+  if (
+    normalized.includes("ssc") ||
+    normalized.includes("rail") ||
+    normalized.includes("wbcs")
+  ) {
+    return "/subjects/ssc-rail-wbcs";
+  }
+  if (normalized.includes("bank")) {
+    return "/subjects/all-bank-exams";
+  }
+  if (normalized.includes("portal")) {
+    return "/subjects/exams-portal";
+  }
+  if (normalized.includes("9 to 12") || normalized.includes("class 9")) {
+    return "/subjects/gk-class-9-12";
+  }
+  if (normalized.includes("one line")) {
+    return "/subjects/one-line-gk";
+  }
+  return `/subjects?type_id=${cat.id}`;
+};
 
 export default function HomePage() {
+  const { data: homeFeed, isLoading, refetch, isRefetching } = useHomeFeedQuery();
+
+  // Extract sliders & video class categories from feed
+  const sliderItem = homeFeed?.find(
+    (item) => (item.sliders && item.sliders.length > 0) || item.type === 1
+  );
+  const liveSliders = sliderItem?.sliders || [];
+
+  const categoryItem = homeFeed?.find(
+    (item) => (item.types && item.types.length > 0) || item.type === 5
+  );
+  const liveCategories: HomeCategoryType[] = categoryItem?.types || [];
+
   const [activeBannerIdx, setActiveBannerIdx] = useState(0);
 
-  // Auto-advance banner every 5 seconds
+  // Auto-advance banner every 5 seconds if live sliders exist
   useEffect(() => {
+    if (liveSliders.length <= 1) return;
     const timer = setInterval(() => {
-      setActiveBannerIdx((prev) => (prev + 1) % mockPromoBanners.length);
+      setActiveBannerIdx((prev) => (prev + 1) % liveSliders.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
-
-  const activeBanner = mockPromoBanners[activeBannerIdx];
-
-  // Map category icons with compact styling
-  const renderCategoryIcon = (iconType: string) => {
-    switch (iconType) {
-      case "book-gear":
-        return (
-          <div className="w-10 h-10 rounded-md bg-sky-50 flex items-center justify-center text-sky-600 mb-2.5 transition-transform group-hover:scale-105">
-            <BookOpen className="w-5 h-5 stroke-[2.2]" />
-          </div>
-        );
-      case "charts":
-        return (
-          <div className="w-10 h-10 rounded-md bg-amber-50 flex items-center justify-center text-amber-600 mb-2.5 transition-transform group-hover:scale-105">
-            <PieChart className="w-5 h-5 stroke-[2.2]" />
-          </div>
-        );
-      case "bank":
-        return (
-          <div className="w-10 h-10 rounded-md bg-emerald-50 flex items-center justify-center text-emerald-600 mb-2.5 transition-transform group-hover:scale-105">
-            <Landmark className="w-5 h-5 stroke-[2.2]" />
-          </div>
-        );
-      case "lightbulb":
-        return (
-          <div className="w-10 h-10 rounded-md bg-indigo-50 flex items-center justify-center text-indigo-600 mb-2.5 transition-transform group-hover:scale-105">
-            <Lightbulb className="w-5 h-5 stroke-[2.2]" />
-          </div>
-        );
-      case "single-bulb":
-      default:
-        return (
-          <div className="w-10 h-10 rounded-md bg-sky-50 flex items-center justify-center text-sky-600 mb-2.5 transition-transform group-hover:scale-105">
-            <Sparkles className="w-5 h-5 stroke-[2.2]" />
-          </div>
-        );
-    }
-  };
+  }, [liveSliders.length]);
 
   return (
-    <div className="space-y-5 w-full">
-      {/* 1. Compact Promotional Carousel Banner */}
-      <div className="relative overflow-hidden rounded-lg shadow-2xs border border-slate-200/80 bg-white">
-        <div
-          className={`relative p-5 sm:p-6 bg-gradient-to-r ${activeBanner.bgGradient} text-white transition-all duration-500`}
-        >
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1.5 max-w-xl">
-              <span className="inline-block bg-amber-400 text-slate-950 font-black text-xs px-2.5 py-0.5 rounded shadow-2xs">
-                {activeBanner.highlightText}
-              </span>
-              <h2 className="text-lg sm:text-2xl font-black tracking-tight text-white leading-snug">
-                {activeBanner.title}
-              </h2>
-              <p className="text-xs text-sky-100 font-medium flex items-center gap-1.5">
-                <PhoneCall className="w-3.5 h-3.5 text-amber-300" />
-                {activeBanner.subtitle}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Link
-                href={activeBanner.ctaLink}
-                className="inline-flex items-center gap-1.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-4 py-2 rounded-md shadow-xs text-xs transition-transform active:scale-95"
-              >
-                <span>{activeBanner.ctaText}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
+    <div className="space-y-5 w-full pb-10">
+      {/* 1. Promotional Carousel Banner */}
+      {isLoading && liveSliders.length === 0 ? (
+        <div className="relative w-full aspect-[21/9] sm:aspect-[21/8] max-h-64 rounded-lg bg-slate-200/80 animate-pulse flex items-center justify-center border border-slate-200">
+          <Loader2 className="w-6 h-6 animate-spin text-sky-600" />
         </div>
-
-        {/* Compact Banner Dots */}
-        <div className="py-2 bg-white flex justify-center items-center gap-1.5">
-          {mockPromoBanners.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveBannerIdx(idx)}
-              aria-label={`Go to slide ${idx + 1}`}
-              className={`transition-all duration-200 ${
-                activeBannerIdx === idx
-                  ? "w-6 h-1.5 rounded-full bg-sky-600"
-                  : "w-1.5 h-1.5 rounded-full bg-slate-300 hover:bg-slate-400"
-              }`}
+      ) : liveSliders.length > 0 ? (
+        <div className="relative group overflow-hidden rounded-lg shadow-2xs border border-slate-200/80 bg-white">
+          <div className="relative w-full aspect-[21/9] sm:aspect-[21/8] md:aspect-[21/7] max-h-72 bg-slate-100 overflow-hidden">
+            <Image
+              src={liveSliders[activeBannerIdx]?.image_url}
+              alt="Promotion Banner"
+              fill
+              priority
+              unoptimized
+              className="object-cover transition-all duration-500"
             />
-          ))}
-        </div>
-      </div>
 
-      {/* 2. Quick Action Cards (Compact, rounded-md, no clunky borders) */}
+            {/* Left / Right Arrow Navigation */}
+            {liveSliders.length > 1 && (
+              <>
+                <button
+                  onClick={() =>
+                    setActiveBannerIdx((prev) =>
+                      prev === 0 ? liveSliders.length - 1 : prev - 1
+                    )
+                  }
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/65 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs cursor-pointer"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() =>
+                    setActiveBannerIdx((prev) => (prev + 1) % liveSliders.length)
+                  }
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/65 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs cursor-pointer"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Dots Indicator */}
+          {liveSliders.length > 1 && (
+            <div className="py-2.5 bg-white flex justify-center items-center gap-1.5 border-t border-slate-100">
+              {liveSliders.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveBannerIdx(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`transition-all duration-200 cursor-pointer ${
+                    activeBannerIdx === idx
+                      ? "w-6 h-1.5 rounded-full bg-sky-600"
+                      : "w-1.5 h-1.5 rounded-full bg-slate-300 hover:bg-slate-400"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      {/* 2. Quick Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         {/* Card 1: Chapter wise MCQ */}
         <Link
@@ -201,7 +219,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 4. Video Classes Category Grid (Clean cards, NO bottom border) */}
+      {/* 4. Video Classes Category Grid */}
       <section className="space-y-3 pt-1">
         <div className="flex items-center justify-between">
           <div>
@@ -212,33 +230,72 @@ export default function HomePage() {
               Curated syllabus-focused video courses by top faculty
             </p>
           </div>
-          <Link
-            href="/subjects"
-            className="text-xs font-semibold text-sky-600 hover:underline"
-          >
-            View all categories
-          </Link>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => refetch()}
+              disabled={isLoading || isRefetching}
+              className="p-1 rounded-md text-slate-400 hover:text-sky-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              title="Refresh home feed"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${
+                  isLoading || isRefetching ? "animate-spin text-sky-600" : ""
+                }`}
+              />
+            </button>
+            <Link
+              href="/subjects"
+              className="text-xs font-semibold text-sky-600 hover:underline"
+            >
+              View all
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-          {mockVideoClassCategories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/subjects/${cat.slug}`}
-              className="group block"
-            >
-              <Card className="h-full flex flex-col items-center justify-center text-center p-4 sm:p-5 bg-white hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-pointer min-h-[140px]">
-                {renderCategoryIcon(cat.iconType)}
-                <h3 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-1">
-                  {cat.title}
-                </h3>
-                <span className="text-[10px] text-slate-400 mt-0.5 font-medium line-clamp-1">
-                  {cat.itemCountDescription}
-                </span>
-              </Card>
-            </Link>
-          ))}
-        </div>
+        {/* Categories Grid */}
+        {isLoading && liveCategories.length === 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="h-36 rounded-md bg-slate-100 animate-pulse border border-slate-200"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+            {liveCategories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={getCategoryHref(cat)}
+                className="group block"
+              >
+                <Card className="h-full flex flex-col items-center justify-center text-center p-4 sm:p-5 bg-white hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300 transition-all duration-200 cursor-pointer min-h-[145px]">
+                  {cat.image ? (
+                    <div className="relative w-12 h-12 sm:w-14 sm:h-14 mb-2.5 shrink-0 flex items-center justify-center transition-transform group-hover:scale-105">
+                      <Image
+                        src={cat.image}
+                        alt={cat.title}
+                        fill
+                        unoptimized
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-md bg-sky-50 flex items-center justify-center text-sky-600 mb-2.5 transition-transform group-hover:scale-105">
+                      <BookOpen className="w-5 h-5 stroke-[2.2]" />
+                    </div>
+                  )}
+
+                  <h3 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-2">
+                    {cat.title}
+                  </h3>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
