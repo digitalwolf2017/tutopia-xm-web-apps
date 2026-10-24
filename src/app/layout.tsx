@@ -31,6 +31,7 @@ export const viewport: Viewport = {
 };
 
 import { AuthProvider } from "@/features/auth/auth-context";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 export default function RootLayout({
   children,
@@ -40,7 +41,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.variable} font-sans min-h-screen bg-slate-50 text-slate-900 antialiased flex flex-col`}>
-        <AuthProvider>{children}</AuthProvider>
+        <QueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
