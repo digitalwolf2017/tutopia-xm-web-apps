@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { mockLiveBatches } from "@/lib/mock-data";
 import { useHomeFeedQuery } from "@/features/home/api/hooks";
 import { HomeCategoryType } from "@/features/home/api/types";
 
@@ -186,40 +185,7 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* 3. Live Batch Quick Notification */}
-      {mockLiveBatches[0] && (
-        <div className="bg-white border border-amber-200/80 rounded-md p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-          <div className="flex items-center gap-3">
-            <span className="flex h-2.5 w-2.5 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500" />
-            </span>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200/60 uppercase">
-                  Upcoming Live
-                </span>
-                <span className="text-xs font-bold text-slate-900">
-                  {mockLiveBatches[0].title}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-slate-400" />
-                <span>Starts {mockLiveBatches[0].upcomingLiveTime}</span>
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/live-classes"
-            className="text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white px-3.5 py-1.5 rounded-md transition-colors text-center shrink-0"
-          >
-            Enter Classroom
-          </Link>
-        </div>
-      )}
-
-      {/* 4. Video Classes Category Grid */}
+      {/* 3. Video Classes Category Grid */}
       <section className="space-y-3 pt-1">
         <div className="flex items-center justify-between">
           <div>
