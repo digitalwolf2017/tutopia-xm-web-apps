@@ -51,3 +51,12 @@ export function useVideoPlayQuery(
     enabled: !!tutorialId,
   });
 }
+
+export function useChapterNotesQuery(chapterId: string | number | null) {
+  return useQuery({
+    queryKey: ["subjects", "notes", chapterId],
+    queryFn: () => subjectsEndpoints.getChapterNotes(chapterId!),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!chapterId,
+  });
+}

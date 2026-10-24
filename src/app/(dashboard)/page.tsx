@@ -139,7 +139,7 @@ export default function HomePage() {
 
         {/* Card 2: Competitive Exam Explorer */}
         <Link
-          href="/subjects/ssc-rail-wbcs"
+          href="/subjects"
           className="flex items-center justify-between p-3.5 sm:p-4 bg-white hover:bg-slate-50 text-slate-800 rounded-md border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.99] group"
         >
           <div className="flex items-center gap-3">

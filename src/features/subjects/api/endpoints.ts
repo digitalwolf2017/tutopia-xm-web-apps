@@ -7,12 +7,14 @@ import {
   TutorialItem,
   ChapterItem,
   VideoPlayData,
+  ChapterNoteItem,
   competitiveTypeSchema,
   competitiveTypeDetailSchema,
   chaptersDataSchema,
   chapterItemSchema,
   tutorialItemSchema,
   videoPlayResponseSchema,
+  chapterNoteItemSchema,
 } from "./types";
 
 export const subjectsEndpoints = {
@@ -115,5 +117,22 @@ export const subjectsEndpoints = {
       return target as VideoPlayData;
     }
     return null;
+  },
+
+  getChapterNotes: async (
+    chapterId: string | number
+  ): Promise<ChapterNoteItem[]> => {
+    const raw = await apiClient.get<unknown>(`v1/chapter-notes/${chapterId}`);
+    const target =
+      raw && typeof raw === "object" && "data" in raw
+        ? (raw as { data: unknown }).data
+        : raw;
+
+    if (Array.isArray(target)) {
+      const parsed = z.array(chapterNoteItemSchema).safeParse(target);
+      if (parsed.success) return parsed.data;
+      return target as ChapterNoteItem[];
+    }
+    return [];
   },
 };

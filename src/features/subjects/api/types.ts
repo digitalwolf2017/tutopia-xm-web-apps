@@ -112,6 +112,15 @@ export const videoPlayResponseSchema = z.object({
   is_free: z.number().optional().nullable(),
 });
 
+export const chapterNoteItemSchema = z.object({
+  id: z.number(),
+  com_chapter_id: z.number().optional().nullable(),
+  vendor_id: z.number().optional().nullable(),
+  heading: z.string().default("Chapter Notes"),
+  description: z.string().optional().nullable(),
+  file: z.string(),
+});
+
 export type CompetitiveType = z.infer<typeof competitiveTypeSchema>;
 export type SubjectItem = z.infer<typeof subjectItemSchema>;
 export type SubjectCategory = z.infer<typeof subjectCategorySchema>;
@@ -121,6 +130,7 @@ export type ChapterItem = z.infer<typeof chapterItemSchema>;
 export type ChaptersData = z.infer<typeof chaptersDataSchema>;
 export type TutorialItem = z.infer<typeof tutorialItemSchema>;
 export type VideoPlayData = z.infer<typeof videoPlayResponseSchema>;
+export type ChapterNoteItem = z.infer<typeof chapterNoteItemSchema>;
 
 export interface VideoLessonItem {
   id: string | number;
