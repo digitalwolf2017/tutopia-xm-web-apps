@@ -46,7 +46,35 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   skipAuth?: boolean;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+/**
+ * Resolves the API Base URL from environment variables
+ */
+export function getApiBaseUrl(): string {
+  const envUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    'https://competitive.tutopia.in/api';
+
+  return envUrl.trim().replace(/^["']|["']$/g, '').replace(/\/+$/, '');
+}
+
+/**
+ * Builds the complete request URL, normalizing duplicate /api paths
+ */
+function buildRequestUrl(endpoint: string): URL {
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    return new URL(endpoint);
+  }
+
+  const base = getApiBaseUrl();
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  // Avoid duplicate '/api' segment if base already ends with '/api'
+  if (base.endsWith('/api') && cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = cleanEndpoint.replace(/^\/api/, '');
+  }
+
+  return new URL(`${base}${cleanEndpoint}`);
+}
 
 /**
  * Helper to retrieve stored auth token on the client
@@ -95,9 +123,7 @@ async function request<T>(
   const { params, body, headers, token, skipAuth, ...customConfig } = options;
 
   // Build full URL with query parameters
-  const isAbsolute = endpoint.startsWith('http://') || endpoint.startsWith('https://');
-  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = new URL(isAbsolute ? endpoint : `${BASE_URL}${normalizedEndpoint}`, typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  const url = buildRequestUrl(endpoint);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
