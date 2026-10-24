@@ -152,6 +152,14 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
 - [x] Provide scorecard summary with overall accuracy, correct/incorrect counters, and retake quiz capabilities.
 - [x] Production build passes cleanly across all 20 routes (`npm run build` exits with code 0).
 
+### Phase 14: Competitive Exam Tracks & Learning Analytics Hub
+- [x] Full audit and testing of Tutopia Graph Feed OpenAPI endpoints (`v1/graph`, `v1/graph-total-video`, `v1/graph-total-watched`, `v1/graph-attempted-question`, `v1/graph-mock-test`).
+- [x] Build feature API slice in `src/features/exam-tracks/api/` (`types.ts`, `query-keys.ts`, `endpoints.ts`, `hooks.ts`).
+- [x] Create reusable performance components (`GraphMetricCard`, `LearningBarChart`, `PracticeTrendChart`).
+- [x] Build `/exam-tracks` portal with dual tabs: Learning Graphs (24h/7d/30d filters, subject dropdown, KPI stats, charts, study streak) and Browse Exam Tracks.
+- [x] Connect Card 2 on Dashboard Home page to `/exam-tracks`.
+- [x] Production build passes cleanly across all 20 routes (`npm run build` exits with code 0).
+
 ---
 
 ## 5. Decision Log
@@ -192,5 +200,10 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
   2. [`/chapter-mcq/[examCategory]/[subjectSlug]`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/chapter-mcq/[examCategory]/[subjectSlug]/page.tsx): Subject chapter list with sibling topic switcher, question count badges, and "Start Practice" CTA.
   3. [`/chapter-mcq/[examCategory]/[subjectSlug]/[chapterSlug]`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/chapter-mcq/[examCategory]/[subjectSlug]/[chapterSlug]/page.tsx): Interactive practice quiz runner with live evaluation, diagram support, step-by-step explanations, question palette navigation, and retake capability.
   Verified 100% clean production build pass across all routes (`npm run build` exits 0).
+- **2026-10-25:** Competitive Exam Tracks & Learning Analytics Hub: Built full feature API slice in `src/features/exam-tracks/api/` (`useGraphFeedQuery`, `examTracksEndpoints.getGraphFeed`) mapped to `v1/graph`. Created unified Exam Tracks and Analytics portal at [`/exam-tracks`](file:///Users/abhilash/work/nextjs/tutopia-xm-web-apps/src/app/(dashboard)/exam-tracks/page.tsx) featuring a dual-tab experience:
+  1. **My Learning Graphs**: Timeframe selector (`24 Hours`, `7 Days`, `30 Days`), subject dropdown filter, 4 KPI cards (Study Time, Videos Watched, MCQs Solved, Mock Tests), responsive SVG Daily Study Time bar chart, and MCQs & Mock Tests consistency trend chart with hover tooltips and daily study streak banner.
+  2. **Browse Exam Tracks & Syllabus**: Visual catalog of Tutopia competitive tracks with descriptions and direct links to courses.
+  Connected Card 2 on Dashboard Home page to `/exam-tracks`. Verified 100% clean production build pass across all 20 routes (`npm run build` exits 0).
+
 
 

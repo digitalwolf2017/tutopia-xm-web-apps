@@ -137,9 +137,9 @@ export default function HomePage() {
           <ChevronRight className="w-5 h-5 text-sky-200 group-hover:translate-x-1 transition-transform" />
         </Link>
 
-        {/* Card 2: Competitive Exam Explorer */}
+        {/* Card 2: Competitive Exam Tracks & Analytics */}
         <Link
-          href="/subjects"
+          href="/exam-tracks"
           className="flex items-center justify-between p-3.5 sm:p-4 bg-white hover:bg-slate-50 text-slate-800 rounded-md border border-slate-200/80 hover:border-slate-300 shadow-2xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.99] group"
         >
           <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ export default function HomePage() {
                 Competitive Exam Tracks
               </span>
               <span className="text-[11px] text-slate-500 font-normal">
-                Explore SSC, WBCS, Railways & Banking syllabus
+                Learning progress, preparation graphs & syllabus
               </span>
             </div>
           </div>
