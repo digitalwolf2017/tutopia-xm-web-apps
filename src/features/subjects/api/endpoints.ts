@@ -8,6 +8,7 @@ import {
   ChapterItem,
   VideoPlayData,
   ChapterNoteItem,
+  PracticeQuestion,
   competitiveTypeSchema,
   competitiveTypeDetailSchema,
   chaptersDataSchema,
@@ -15,6 +16,7 @@ import {
   tutorialItemSchema,
   videoPlayResponseSchema,
   chapterNoteItemSchema,
+  practiceQuestionSchema,
 } from "./types";
 
 export const subjectsEndpoints = {
@@ -134,5 +136,56 @@ export const subjectsEndpoints = {
       return target as ChapterNoteItem[];
     }
     return [];
+  },
+
+  getChapterPractices: async (
+    chapterId: string | number
+  ): Promise<{ questions: PracticeQuestion[]; chapterInfo?: Record<string, unknown> | null }> => {
+    try {
+      const raw = await apiClient.get<unknown>(`v1/chapter-practices/${chapterId}`);
+      const dataObj =
+        raw && typeof raw === "object" && "data" in raw
+          ? (raw as { data: unknown; chapter?: Record<string, unknown> })
+          : { data: raw, chapter: null };
+
+      const questionsRaw = Array.isArray(dataObj.data) ? dataObj.data : [];
+      const parsed = z.array(practiceQuestionSchema).safeParse(questionsRaw);
+
+      return {
+        questions: parsed.success ? parsed.data : (questionsRaw as PracticeQuestion[]),
+        chapterInfo: dataObj.chapter || null,
+      };
+    } catch {
+      return { questions: [], chapterInfo: null };
+    }
+  },
+
+  setPracticeAnswer: async (params: {
+    questionId: number | string;
+    optionId: number | string;
+    vendorId?: number | string;
+  }): Promise<boolean> => {
+    try {
+      const payload: Record<string, unknown> = {
+        practice_question_id: params.questionId,
+        practice_question_option_id: params.optionId,
+      };
+      if (params.vendorId) {
+        payload.vendor_id = params.vendorId;
+      }
+      await apiClient.post("v1/set-practice-question-answer", payload);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  clearPracticeAnswers: async (chapterId: string | number): Promise<boolean> => {
+    try {
+      await apiClient.get(`v1/clear-practice-question-answer/${chapterId}`);
+      return true;
+    } catch {
+      return false;
+    }
   },
 };

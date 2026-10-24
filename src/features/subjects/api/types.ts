@@ -121,6 +121,34 @@ export const chapterNoteItemSchema = z.object({
   file: z.string(),
 });
 
+export const practiceOptionSchema = z.object({
+  id: z.number(),
+  com_practice_id: z.number().optional().nullable(),
+  option: z.string().default(""),
+  image_url: z.string().optional().nullable(),
+  correct: z.number().default(0),
+});
+
+export const practiceQuestionSchema = z.object({
+  id: z.number(),
+  com_subject_id: z.number().optional().nullable(),
+  com_chapter_id: z.number().optional().nullable(),
+  question: z.string().default(""),
+  question_image: z.string().optional().nullable(),
+  explanation_image: z.string().optional().nullable(),
+  explanation_details: z.string().optional().nullable(),
+  type: z.number().optional().nullable(),
+  active: z.number().optional().nullable(),
+  com_practice_options: z.array(practiceOptionSchema).default([]),
+});
+
+export const chapterPracticesResponseSchema = z.object({
+  data: z.array(practiceQuestionSchema).default([]),
+  chapter: z.record(z.string(), z.any()).optional().nullable(),
+  parent: z.record(z.string(), z.any()).optional().nullable(),
+  chapters: z.array(z.record(z.string(), z.any())).optional().nullable(),
+});
+
 export type CompetitiveType = z.infer<typeof competitiveTypeSchema>;
 export type SubjectItem = z.infer<typeof subjectItemSchema>;
 export type SubjectCategory = z.infer<typeof subjectCategorySchema>;
@@ -131,6 +159,9 @@ export type ChaptersData = z.infer<typeof chaptersDataSchema>;
 export type TutorialItem = z.infer<typeof tutorialItemSchema>;
 export type VideoPlayData = z.infer<typeof videoPlayResponseSchema>;
 export type ChapterNoteItem = z.infer<typeof chapterNoteItemSchema>;
+export type PracticeOption = z.infer<typeof practiceOptionSchema>;
+export type PracticeQuestion = z.infer<typeof practiceQuestionSchema>;
+export type ChapterPracticesResponse = z.infer<typeof chapterPracticesResponseSchema>;
 
 export interface VideoLessonItem {
   id: string | number;
@@ -141,3 +172,4 @@ export interface VideoLessonItem {
   videoUrl?: string;
   thumbUrl?: string;
 }
+

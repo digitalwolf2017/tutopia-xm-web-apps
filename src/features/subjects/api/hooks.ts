@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { subjectsKeys } from "./query-keys";
 import { subjectsEndpoints } from "./endpoints";
 
@@ -60,3 +60,36 @@ export function useChapterNotesQuery(chapterId: string | number | null) {
     enabled: !!chapterId,
   });
 }
+
+export function useChapterPracticesQuery(chapterId: string | number | null) {
+  return useQuery({
+    queryKey: ["subjects", "practices", chapterId],
+    queryFn: () => subjectsEndpoints.getChapterPractices(chapterId!),
+    staleTime: 2 * 60 * 1000,
+    enabled: !!chapterId,
+  });
+}
+
+export function useSetPracticeAnswerMutation() {
+  return useMutation({
+    mutationFn: (params: {
+      questionId: number | string;
+      optionId: number | string;
+      vendorId?: number | string;
+    }) => subjectsEndpoints.setPracticeAnswer(params),
+  });
+}
+
+export function useClearPracticeAnswersMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (chapterId: string | number) =>
+      subjectsEndpoints.clearPracticeAnswers(chapterId),
+    onSuccess: (_, chapterId) => {
+      queryClient.invalidateQueries({
+        queryKey: ["subjects", "practices", chapterId],
+      });
+    },
+  });
+}
+
