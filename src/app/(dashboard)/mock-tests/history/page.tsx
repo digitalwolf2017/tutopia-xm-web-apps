@@ -7,13 +7,13 @@ import {
   Award,
   Clock,
   RotateCcw,
-  Loader2,
   FileQuestion,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCompletedExamsQuery } from "@/features/mock-tests/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 export default function MockTestHistoryPage() {
   const { data: completedExams, isLoading } =
@@ -65,9 +65,8 @@ export default function MockTestHistoryPage() {
       </div>
 
       {isLoading && (
-        <div className="flex items-center justify-center py-12 gap-2 text-xs text-slate-500">
-          <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-          <span>Loading your past exam attempts...</span>
+        <div className="flex items-center justify-center py-12">
+          <TutopiaLoader size="md" label="Loading your past exam attempts..." />
         </div>
       )}
 

@@ -22,6 +22,7 @@ import {
   useCitiesQuery,
   useUpdateProfileMutation,
 } from "@/features/auth/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -142,9 +143,8 @@ export default function EditProfilePage() {
       )}
 
       {isLoadingProfile ? (
-        <div className="bg-white p-12 rounded-xl border border-slate-200 flex flex-col items-center justify-center gap-2">
-          <Loader2 className="w-6 h-6 animate-spin text-sky-600" />
-          <span className="text-xs text-slate-500">Loading student profile...</span>
+        <div className="bg-white p-12 rounded-xl border border-slate-200 flex flex-col items-center justify-center">
+          <TutopiaLoader size="md" label="Loading student profile..." />
         </div>
       ) : (
         <form

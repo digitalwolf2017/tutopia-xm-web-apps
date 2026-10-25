@@ -8,6 +8,7 @@ import {
   useCompetitiveTypesQuery,
   useCompetitiveTypeDetailQuery,
 } from "@/features/subjects/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 export default function ChapterMcqPage() {
   const { data: competitiveTypes = [], isLoading: isLoadingTypes } = useCompetitiveTypesQuery();
@@ -74,9 +75,8 @@ export default function ChapterMcqPage() {
 
       {/* 3. Loading State */}
       {isLoading && (
-        <div className="flex items-center justify-center py-16 gap-2 text-xs text-slate-500">
-          <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-          <span>Loading practice topics...</span>
+        <div className="flex items-center justify-center py-16">
+          <TutopiaLoader size="md" label="Loading practice topics..." />
         </div>
       )}
 

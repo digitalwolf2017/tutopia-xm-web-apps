@@ -16,6 +16,7 @@ import {
   useVideoPlayQuery,
   useChapterNotesQuery,
 } from "@/features/subjects/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 interface VideoPlayerDialogProps {
   lesson: VideoLessonItem | null;
@@ -104,9 +105,8 @@ export function VideoPlayerDialog({
         {/* Video Player Container (16:9 Aspect Ratio) */}
         <div className="relative w-full aspect-video bg-black flex items-center justify-center overflow-hidden group">
           {isLoadingVideo ? (
-            <div className="flex flex-col items-center justify-center gap-2 text-slate-400 text-xs">
-              <Loader2 className="w-8 h-8 animate-spin text-sky-500" />
-              <span>Connecting to Tutopia video stream...</span>
+            <div className="flex flex-col items-center justify-center p-6">
+              <TutopiaLoader size="md" label="Connecting to Tutopia video stream..." />
             </div>
           ) : videoStreamUrl ? (
             <video

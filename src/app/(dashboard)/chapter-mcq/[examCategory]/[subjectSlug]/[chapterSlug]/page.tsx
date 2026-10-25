@@ -26,6 +26,7 @@ import {
   useChaptersQuery,
   useCompetitiveTypeDetailQuery,
 } from "@/features/subjects/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 import { PracticeOption } from "@/features/subjects/api/types";
 
 export default function ChapterMcqQuizRunnerPage() {
@@ -152,9 +153,8 @@ export default function ChapterMcqQuizRunnerPage() {
   // Loading View
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3 text-slate-500">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-        <p className="text-sm font-medium">Loading chapter practice questions...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <TutopiaLoader size="lg" label="Loading chapter practice questions..." />
       </div>
     );
   }

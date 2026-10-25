@@ -130,18 +130,19 @@ export function TutopiaLogoBulbSvg({
 export function TutopiaLoader({
   size = "md",
   className,
+  label,
 }: TutopiaLoaderProps) {
   const getPixelSize = () => {
     switch (size) {
       case "sm":
-        return 36;
+        return 32;
       case "lg":
-        return 92;
+        return 80;
       case "fullscreen":
         return 88;
       case "md":
       default:
-        return 60;
+        return 52;
     }
   };
 
@@ -149,16 +150,22 @@ export function TutopiaLoader({
 
   if (size === "fullscreen") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white select-none">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-white select-none">
         <TutopiaLogoBulbSvg size={pixelSize} />
+        {label && (
+          <span className="text-xs font-semibold text-slate-600 tracking-tight">{label}</span>
+        )}
       </div>
     );
   }
 
   // Inline / Section Loader
   return (
-    <div className={cn("inline-flex items-center justify-center", className)}>
+    <div className={cn("inline-flex flex-col items-center justify-center gap-2", className)}>
       <TutopiaLogoBulbSvg size={pixelSize} />
+      {label && (
+        <span className="text-xs font-semibold text-slate-600 tracking-tight">{label}</span>
+      )}
     </div>
   );
 }

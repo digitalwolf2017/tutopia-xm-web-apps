@@ -8,7 +8,6 @@ import {
   BookOpen,
   MessageSquare,
   ChevronRight,
-  Loader2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useCompetitiveTypesQuery } from "@/features/subjects/api/hooks";

@@ -20,6 +20,7 @@ import {
   useExamDetailsQuery,
   useSubmitExamMutation,
 } from "@/features/mock-tests/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 interface RunnerQuestion {
   id: number;
@@ -139,8 +140,7 @@ export default function MockTestTakePage() {
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 bg-slate-900 flex flex-col items-center justify-center gap-3 text-white">
-        <Loader2 className="w-8 h-8 animate-spin text-sky-400" />
-        <span className="text-sm font-semibold">Loading CBT Question Paper...</span>
+        <TutopiaLoader size="lg" label="Loading CBT Question Paper..." />
       </div>
     );
   }

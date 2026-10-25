@@ -23,6 +23,7 @@ import { useGraphFeedQuery } from "@/features/exam-tracks/api/hooks";
 import { GraphDataPoint } from "@/features/exam-tracks/api/types";
 import { GraphMetricCard } from "@/features/exam-tracks/components/graph-metric-card";
 import { LearningBarChart } from "@/features/exam-tracks/components/learning-bar-chart";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 import { PracticeTrendChart } from "@/features/exam-tracks/components/practice-trend-chart";
 import {
   useCompetitiveTypesQuery,
@@ -242,9 +243,8 @@ export default function ExamTracksPage() {
 
           {/* Loading Indicator */}
           {isLoadingGraph && (
-            <div className="flex items-center justify-center py-6 gap-2 text-xs text-slate-500">
-              <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-              <span>Updating graph feed...</span>
+            <div className="flex items-center justify-center py-6">
+              <TutopiaLoader size="sm" label="Updating graph feed..." />
             </div>
           )}
 

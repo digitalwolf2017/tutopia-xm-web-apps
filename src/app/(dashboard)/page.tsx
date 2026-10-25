@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useHomeFeedQuery } from "@/features/home/api/hooks";
 import { HomeCategoryType } from "@/features/home/api/types";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 export default function HomePage() {
   const { data: homeFeed, isLoading } = useHomeFeedQuery();
@@ -52,8 +53,8 @@ export default function HomePage() {
     <div className="space-y-5 w-full pb-10">
       {/* 1. Promotional Carousel Banner */}
       {isLoading && liveSliders.length === 0 ? (
-        <div className="relative w-full aspect-[21/9] sm:aspect-[21/8] max-h-64 rounded-lg bg-slate-200/80 animate-pulse flex items-center justify-center border border-slate-200">
-          <Loader2 className="w-6 h-6 animate-spin text-sky-600" />
+        <div className="relative w-full aspect-[21/9] sm:aspect-[21/8] max-h-64 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-200">
+          <TutopiaLoader size="md" />
         </div>
       ) : liveSliders.length > 0 ? (
         <div className="relative group overflow-hidden rounded-lg shadow-2xs border border-slate-200/80 bg-white">

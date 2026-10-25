@@ -19,6 +19,7 @@ import {
   useExamsQuery,
   useExamCategoriesQuery,
 } from "@/features/mock-tests/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 export default function MockTestsPage() {
   const [activeCategoryId, setActiveCategoryId] = useState<string | number>("ALL");
@@ -121,9 +122,8 @@ export default function MockTestsPage() {
 
       {/* Loading state indicator */}
       {isLoadingExams && (
-        <div className="flex items-center justify-center py-10 gap-2 text-xs text-slate-500">
-          <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-          <span>Loading available test series...</span>
+        <div className="flex items-center justify-center py-12">
+          <TutopiaLoader size="md" label="Loading available test series..." />
         </div>
       )}
 

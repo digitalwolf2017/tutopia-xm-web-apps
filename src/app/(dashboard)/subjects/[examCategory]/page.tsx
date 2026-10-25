@@ -12,6 +12,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useCompetitiveTypeDetailQuery } from "@/features/subjects/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 
 export default function SubjectChapterGridPage() {
   const params = useParams();
@@ -140,9 +141,8 @@ export default function SubjectChapterGridPage() {
 
       {/* Loading state */}
       {isLoading && !categoryDetail && (
-        <div className="flex items-center justify-center py-12 gap-2 text-xs text-slate-500">
-          <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-          <span>Loading subjects and topics...</span>
+        <div className="flex items-center justify-center py-12">
+          <TutopiaLoader size="md" label="Loading subjects and topics..." />
         </div>
       )}
 

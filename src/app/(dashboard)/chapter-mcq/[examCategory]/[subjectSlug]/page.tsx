@@ -16,6 +16,7 @@ import {
   useChaptersQuery,
   useCompetitiveTypeDetailQuery,
 } from "@/features/subjects/api/hooks";
+import { TutopiaLoader } from "@/components/common/tutopia-loader";
 import { SubjectItem } from "@/features/subjects/api/types";
 
 export default function ChapterMcqSubjectChaptersPage() {
@@ -129,9 +130,8 @@ export default function ChapterMcqSubjectChaptersPage() {
 
       {/* 3. Loading state */}
       {isLoading && chapters.length === 0 && (
-        <div className="flex items-center justify-center py-16 gap-2 text-xs text-slate-500">
-          <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-          <span>Loading practice chapters...</span>
+        <div className="flex items-center justify-center py-16">
+          <TutopiaLoader size="md" label="Loading practice chapters..." />
         </div>
       )}
 
