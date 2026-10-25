@@ -213,6 +213,4 @@ All agents and developers must adhere to the rules located in [`rules/`](file://
   1. **My Learning Graphs**: Timeframe selector (`24 Hours`, `7 Days`, `30 Days`), subject dropdown filter, 4 KPI cards (Study Time, Videos Watched, MCQs Solved, Mock Tests), responsive SVG Daily Study Time bar chart, and MCQs & Mock Tests consistency trend chart with hover tooltips and daily study streak banner.
   2. **Browse Exam Tracks & Syllabus**: Visual catalog of Tutopia competitive tracks with descriptions and direct links to courses.
   Connected Card 2 on Dashboard Home page to `/exam-tracks`. Verified 100% clean production build pass across all 20 routes (`npm run build` exits 0).
-
-
-
+- **2026-10-26:** Animated SVG Bulb Borderline Loader: Removed the fuzzy circular background glow. Upgraded the SVG lightbulb loading state with an animated running borderline that races and traces continuously around the bulb's perimeter (`pathLength="100"`, `animate-bulb-border`), combined with a clean base outline track, vibrant brand yellow fill (`#FFC107`), upper-left white specular shine highlight, 5 radiating rays, and pure minimal centered display on a crisp white backdrop. Verified 100% clean TypeScript and production build.
