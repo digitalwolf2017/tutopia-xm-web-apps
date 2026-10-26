@@ -32,9 +32,13 @@ export default function LiveClassesPage() {
           </p>
         </div>
 
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse" />
-          <span>Live Now</span>
+        <span
+          title="Live Now"
+          aria-label="Live Now"
+          className="inline-flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1 rounded-md text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 shrink-0"
+        >
+          <Radio className="w-4 h-4 text-rose-600 animate-pulse shrink-0" />
+          <span className="hidden sm:inline">Live Now</span>
         </span>
       </div>
 
